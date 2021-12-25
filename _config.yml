@@ -238,6 +238,8 @@ responsive_image:
 imagemagick:
   enabled: true
   widths:
+    - 120
+    - 240
     - 480
     - 800
     - 1400
