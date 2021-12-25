@@ -6,6 +6,8 @@
 
 p, h1, h2, h3, h4, h5, h6, em, div, li, span, strong {
   color: var(--global-text-color);
+  font-family: 'Computer Modern Sans';
+  // text-align: justify;
 }
 
 hr {
@@ -212,7 +214,7 @@ blockquote {
 .social {
   text-align: center;
   .contact-icons {
-    font-size: 4rem;
+    font-size: 2rem;
     a {
       i::before {
         color: var(--global-text-color);
@@ -375,7 +377,6 @@ footer.sticky-bottom {
   }
 }
 
-
 // Publications
 
 .publications {
@@ -409,7 +410,7 @@ footer.sticky-bottom {
     li {
       margin-bottom: 1rem;
       .abbr {
-        height: 2rem;
+        height: 1rem;
         margin-bottom: 0.5rem;
         abbr {
           display: inline-block;
@@ -417,7 +418,7 @@ footer.sticky-bottom {
           padding-left: 1rem;
           padding-right: 1rem;
           a {
-            color: white;
+            color: var(--global-text-color);
             &:hover {
               text-decoration: none;
             }
