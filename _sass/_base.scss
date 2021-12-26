@@ -236,6 +236,11 @@ blockquote {
   color: var(--global-text-color);
 }
 
+.news-title {
+    color: var(--global-text-color);
+    background-color: var(--global-theme-color);
+}
+
 // Social (bottom)
 
 .social {
