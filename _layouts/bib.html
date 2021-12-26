@@ -15,7 +15,7 @@
 <div class="row">
     {% capture teaser %}{{ entry.teaser | prepend: 'assets/img/'}}{% endcapture %}
     {% if entry.teaser %}
-    <div class="col-sm-2 center-block">
+    <div class="col-sm-3 center-block">
         {% include figure.html path=teaser class="img-fluid rounded z-depth-1" %}
     </div>
     {% else %}
