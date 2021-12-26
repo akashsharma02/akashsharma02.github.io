@@ -1,10 +1,10 @@
-{% assign path = include.path | remove: ".jpg" | remove: ".jpeg" | remove: ".png" | remove: ".tiff" %}
+{% assign path = include.path | remove: ".gif" | remove: ".jpg" | remove: ".jpeg" | remove: ".png" | remove: ".tiff" %}
 
 <figure>
 
   <picture>
     {% for i in site.imagemagick.widths %}
-      <source media="(max-width: {{ i }}px)" srcset="{{ path | relative_url }}-{{ i }}.webp">
+      <source media="(max-width: {{ i }} px)" srcset="{{ path | relative_url }}-{{ i }}.webp">
     {% endfor %}
 
     <!-- Fallback to the original file -->
