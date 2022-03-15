@@ -19,16 +19,25 @@ bibliography: 2022-03-14-graph-slam.bib
 #   - we may want to automate TOC generation in the future using
 #     jekyll-toc plugin (https://github.com/toshimaru/jekyll-toc).
 toc:
-  - name: Motivation
+  - name: Introduction
+  - name: Preliminaries
+    subsections:
+        - name: Gaussian Random Variables
+        - name: Conditional Independence
+        - name: Filtering vs Smoothing
+  - name: MAP estimation over Factor Graphs
+    subsections:
+        - name: Why Factor Graphs?
+        - name: Nonlinear least squares formulation
+        - name: Methods to solve linear systems (Matrix Factorization)
+        - name: Gauss Newton and Levenberg Marquardt
+  - name: The Bayes Tree (iSAM2)
     # if a section has subsections, you can add them as follows:
     # subsections:
     #   - name: Example Child Subsection 1
     #   - name: Example Child Subsection 2
-  - name: Citations
   - name: Footnotes
-  - name: Code Blocks
-  - name: Layouts
-  - name: Other Typography
+  - name: References
 
 # Below is an example of injecting additional post-specific styles.
 # If you use this post as a template, delete this _styles block.
@@ -142,7 +151,7 @@ Now consider the conditional distribution over the two measurements $\mathbf{z}_
 $$
 \begin{align*}
 p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\mathbf{z}_0 |  \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) p(\mathbf{z}_1 |  \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)~~~~\text{conditionally independent}\\
-p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\mathbf{z}_0 |  \mathbf{x}_0, \mathbf{x}_1) p(\mathbf{z}_1 | \mathbf{x}_1, \mathbf{l}_0)~~~~~~~~~~~~~~~~~\text{conditioned on redundant variables}
+p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\mathbf{z}_0 |  \mathbf{x}_0, \mathbf{x}_1) p(\mathbf{z}_1 | \mathbf{x}_1, \mathbf{l}_0)~~~~~~~~~~~~~~~\text{conditioned on redundant variables}
 \end{align*}
 $$
 
