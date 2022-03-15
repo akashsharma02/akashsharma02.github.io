@@ -70,22 +70,83 @@ This article addresses with the backend optimization and motivates the problem f
 
 ### Gaussian Random Variables
 
-A random variable is an outcome of a random event. In our context, the act of measurement is the random event, which produces an output that is a random variable. A classic instance that is cited in many books <d-cite key="thrun2002probabilistic"></d-cite> is the example of odometry measurement. Perhaps due to wheel slip or inconsistent hall-effect, or some other physical property, the sensor measurement may be noisy (random). In most cases, we expect the sensor to reproduce measurements faithful to its underlying state, but many a time it may not. This property may be mathematically modeled by a Gaussian random variable.
+A random variable is an outcome of a random event. In our context, the act of measurement is the random event, which produces an output that is a random variable. A classic instance that is cited in many books <d-cite key="thrun2002probabilistic"></d-cite> is the example of an odometry measurement. Perhaps due to wheel slip or inconsistent hall-effect, or some other physical property, the sensor measurement may be noisy (random). In most cases, we expect the sensor to reproduce measurements faithful to its underlying state, but many a time, it may not. This property may be mathematically modeled by a Gaussian random variable.
 
 $$
 \begin{align}
-\mathbf{z} &= \mathbf{X} + \nu \\
+\mathbf{z} &= \mathbf{x} + \nu \\
 \nu &\sim \mathcal{N}(0; \Sigma)
 \end{align}
 $$
 
-Here, equation (1) means that the state $\mathbf{X}$ is corrupted by inherent additive noise $\nu$ in the sensor. We model this noise $\nu$ as a random variable sampled from a Gaussian probability distribution.
+Here, equation (1) means that the state $\mathbf{x}$ is corrupted by inherent additive noise $\nu$ in the sensor to produce a measurement $\mathbf{z}$. We model this noise $\nu$ as a random variable sampled from a Gaussian probability distribution.
 
-The choice of the probability distribution is rather arbitrary.
+The choice of the probability distribution is rather curious. The Gaussian distribution is part of the exponential family of distributions, and has some convenient *algebraic* properties:
+1. It is fully described by its *sufficient* statistic. For instance, even though the Gaussian distribution has probability mass almost everywhere in its domain (infinite support), the distribution is fully described by its mean and covariance.
+2. The product of Gaussian distributions results in another Gaussian distribution i.e., the conjugate prior of a Gaussian is another Gaussian.
 
+### Conditional Independence of Random variables
 
+In Probability theory, two random variables $\mathbf{x}$ and $\mathbf{y}$ are said to be independent, if their joint distribution equals the product of their probabilities. Intuitively, it means that if the value of $\mathbf{x}$ is observed, then the probability of $\mathbf{y}$ is unaffected.
 
+$$
+\begin{align}
+p(\mathbf{x}, \mathbf{y}) = p(\mathbf{x}) p(\mathbf{y})
+\end{align}
+$$
 
+Similarly, if we consider three random variables $\mathbf{x}$, $\mathbf{y}$ and $\mathbf{z}$, then they are said to be conditionally independent, if
+$$
+\begin{align}
+p(\mathbf{x}, \mathbf{y} | \mathbf{z}) = p(\mathbf{x} | \mathbf{z}) p(\mathbf{y} | \mathbf{z})
+\end{align}
+$$
+
+Conditional independence in the context of SLAM is illustrated with the following example:
+
+Consider a robot in a one dimensional world as in Figure 1 (a).
+At time $t_0$, if we know the location $\mathbf{x}_0$ and $\mathbf{x}_1$, then the robot samples from the odometry sensor a measurement $z_0$ of (say 50.3 m) as follows
+
+$$
+\begin{align}
+z_0 \sim p_{\text{odometry}}(\mathbf{z}_0 | \mathbf{x}_0, \mathbf{x}_1)
+\end{align}
+$$
+
+Similarly, at time $t=1$, if we know that the robot is at 50 meters from origin, and then it samples from the range sensor two measurements $z_1$ and $z_2$ as follows:
+
+$$
+\begin{align}
+z_1 \sim p_{\text{range}}(\mathbf{z}_1 | \mathbf{x}_1, \mathbf{l}_0) \\
+z_2 \sim p_{\text{range}}(\mathbf{z}_2 | \mathbf{x}_1, \mathbf{l}_1)
+\end{align}
+$$
+
+<div class="row">
+    <div class="col-sm mt-3 mt-md-0" align=center>
+        {% include figure.html path="assets/img/robot-1d-illustration.png" title="Robot in a 1D world" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+Figure 1: (a) Illustration of a 1-D robot that observes two landmarks after moving forward by 50 meters at timestep 1. (b) Graphical model representation of the 1-D robot setting.
+</div>
+
+However, consider the selected portion of Figure 1(b) for simplicity. Here we see that, to sample a measurement, we need to sample from the joint distribution i.e., $p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)$.
+
+$$
+p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) = p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) p(\mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) \\
+$$
+
+Now consider the conditional distribution over the two measurements $\mathbf{z}_0, \mathbf{z}_1$. From Equation (5) we know $\mathbf{z}_0$ only depends on $\mathbf{x}_0$ and $\mathbf{x_1}$, and from Equation (6) a similar argument can be made for $\mathbf{z_1}$
+
+$$
+\begin{align*}
+p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\mathbf{z}_0 |  \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) p(\mathbf{z}_1 |  \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)~~~~\text{conditionally independent}\\
+p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\mathbf{z}_0 |  \mathbf{x}_0, \mathbf{x}_1) p(\mathbf{z}_1 | \mathbf{x}_1, \mathbf{l}_0)~~~~~~~~~~~~~~~~~\text{conditioned on redundant variables}
+\end{align*}
+$$
+
+The above assumption of conditional independence between measurements given to-be-estimated state variables is key in reducing the complexity of estimation. It can also be observed that Figure 1(b) implicitly encodes the conditional independence between the measurements.
 
 ## Equations
 
