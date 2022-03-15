@@ -74,12 +74,12 @@ A random variable is an outcome of a random event. In our context, the act of me
 
 $$
 \begin{align}
-\mathbf{z} &= \mathbf{x} + \nu \\
+\mathbf{z} &= h(\mathbf{x}) + \nu \\
 \nu &\sim \mathcal{N}(0; \Sigma)
 \end{align}
 $$
 
-Here, equation (1) means that the state $\mathbf{x}$ is corrupted by inherent additive noise $\nu$ in the sensor to produce a measurement $\mathbf{z}$. We model this noise $\nu$ as a random variable sampled from a Gaussian probability distribution.
+Here, equation (1) means that the state $\mathbf{x}$ is transformed by a measurement function $h$ which is corrupted by inherent additive noise $\nu$ in the sensor to produce a measurement $\mathbf{z}$. We model this noise $\nu$ as a random variable sampled from a Gaussian probability distribution.
 
 The choice of the probability distribution is rather curious. The Gaussian distribution is part of the exponential family of distributions, and has some convenient *algebraic* properties:
 1. It is fully described by its *sufficient* statistic. For instance, even though the Gaussian distribution has probability mass almost everywhere in its domain (infinite support), the distribution is fully described by its mean and covariance.
