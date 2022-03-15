@@ -15,5 +15,7 @@ group :jekyll_plugins do
     gem 'jemoji'
     gem 'unicode_utils'
     gem 'webrick'
+    gem 'htmlcompressor'
+    gem 'htmlbeautifier'
     gem 'jekyll-responsive-image'
 end
