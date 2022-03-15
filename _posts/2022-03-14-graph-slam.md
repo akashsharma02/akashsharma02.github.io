@@ -71,7 +71,7 @@ Most recent literature (post 2000s) partition the problem into the frontend and 
  - The front end of any system that tackles state estimation deals with processing and associating the raw sensor measurements. This results in a set of measurements associated with each to be estimated variable -- typically the robot and landmark poses.
  - The back end is a sensor agnostic optimization framework that takes in the measurement(s) and produces the most likely estimate for each variable according to some notion of distance from the actual (unobserved) variable values.
 
-When all the variables to be estimated are Special Euclidean $\text{SE}(n)$ poses, and the sensors generate relative pose measurements, the optimization problem is called Pose Graph Optimization (PGO) <d-cite key="carlone2015initialization"></d-cite> or Synchronization over the Special Euclidean Group <d-cite key="rosen2019se"></d-cite>. If all the variables are Special orthogonal $\text{SO}(n)$ rotations, then the problem is also called rotation averaging <d-cite key="hartley2013rotation"></d-cite>.
+When all the variables to be estimated are Special Euclidean $$ \text{SE}(n) $$ poses, and the sensors generate relative pose measurements, the optimization problem is called Pose Graph Optimization (PGO) <d-cite key="carlone2015initialization"></d-cite> or Synchronization over the Special Euclidean Group <d-cite key="rosen2019se"></d-cite>. If all the variables are Special orthogonal $$ \text{SO}(n) $$ rotations, then the problem is also called rotation averaging <d-cite key="hartley2013rotation"></d-cite>.
 
 This article addresses with the backend optimization and motivates the problem formulation from first principles.
 
@@ -88,15 +88,15 @@ $$
 \end{align}
 $$
 
-Here, equation (1) means that the state $\mathbf{x}$ is transformed by a measurement function $h$ which is corrupted by inherent additive noise $\nu$ in the sensor to produce a measurement $\mathbf{z}$. We model this noise $\nu$ as a random variable sampled from a Gaussian probability distribution.
+Here, equation (1) means that the state $$ \mathbf{x} $$ is transformed by a measurement function $h$ which is corrupted by inherent additive noise $$ \nu $$ in the sensor to produce a measurement $$\mathbf{z}$$. We model this noise $$\nu$$ as a random variable sampled from a Gaussian probability distribution.
 
 The choice of the probability distribution is rather curious. The Gaussian distribution is part of the exponential family of distributions, and has some convenient *algebraic* properties:
 1. It is fully described by its *sufficient* statistic. For instance, even though the Gaussian distribution has probability mass almost everywhere in its domain (infinite support), the distribution is fully described by its mean and covariance.
-2. The product of Gaussian distributions results in another Gaussian distribution i.e., the conjugate prior of a Gaussian is another Gaussian.
+2. The product of Gaussian distributions results in another Gaussian distribution i.e., the conjugate prior of a Gaussian distribution is another Gaussian.
 
 ### Conditional Independence of Random variables
 
-In Probability theory, two random variables $\mathbf{x}$ and $\mathbf{y}$ are said to be independent, if their joint distribution equals the product of their probabilities. Intuitively, it means that if the value of $\mathbf{x}$ is observed, then the probability of $\mathbf{y}$ is unaffected.
+In Probability theory, two random variables $$\mathbf{x}$$ and $$\mathbf{y}$$ are said to be independent, if their joint distribution equals the product of their probabilities. Intuitively, it means that if the value of $$\mathbf{x}$$ is observed, then the probability of $$\mathbf{y}$$ is unaffected.
 
 $$
 \begin{align}
@@ -104,7 +104,7 @@ p(\mathbf{x}, \mathbf{y}) = p(\mathbf{x}) p(\mathbf{y})
 \end{align}
 $$
 
-Similarly, if we consider three random variables $\mathbf{x}$, $\mathbf{y}$ and $\mathbf{z}$, then they are said to be conditionally independent, if
+Similarly, if we consider three random variables $$\mathbf{x}$$, $$\mathbf{y}$$ and $$\mathbf{z}$$, then they are said to be conditionally independent, if
 $$
 \begin{align}
 p(\mathbf{x}, \mathbf{y} | \mathbf{z}) = p(\mathbf{x} | \mathbf{z}) p(\mathbf{y} | \mathbf{z})
@@ -114,7 +114,7 @@ $$
 Conditional independence in the context of SLAM is illustrated with the following example:
 
 Consider a robot in a one dimensional world as in Figure 1 (a).
-At time $t_0$, if we know the location $\mathbf{x}_0$ and $\mathbf{x}_1$, then the robot samples from the odometry sensor a measurement $z_0$ of (say 50.3 m) as follows
+At time $$t_0$$, if we know the location $$\mathbf{x}_0$$ and $$\mathbf{x}_1$$, then the robot samples from the odometry sensor a measurement $$z_0$$ of (say 50.3 m) as follows
 
 $$
 \begin{align}
@@ -122,7 +122,7 @@ z_0 \sim p_{\text{odometry}}(\mathbf{z}_0 | \mathbf{x}_0, \mathbf{x}_1)
 \end{align}
 $$
 
-Similarly, at time $t=1$, if we know that the robot is at 50 meters from origin, and then it samples from the range sensor two measurements $z_1$ and $z_2$ as follows:
+Similarly, at time $$t=1$$, if we know that the robot is at 50 meters from origin, and then it samples from the range sensor two measurements $$z_1$$ and $$z_2$$ as follows:
 
 $$
 \begin{align}
@@ -140,13 +140,13 @@ $$
 Figure 1: (a) Illustration of a 1-D robot that observes two landmarks after moving forward by 50 meters at timestep 1. (b) Graphical model representation of the 1-D robot setting.
 </div>
 
-However, consider the selected portion of Figure 1(b) for simplicity. Here we see that, to sample a measurement, we need to sample from the joint distribution i.e., $p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)$.
+However, consider the selected portion of Figure 1(b) for simplicity. Here we see that, to sample a measurement, we need to sample from the joint distribution i.e., $$p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)$$.
 
 $$
 p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) = p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) p(\mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) \\
 $$
 
-Now consider the conditional distribution over the two measurements $\mathbf{z}_0, \mathbf{z}_1$. From Equation (5) we know $\mathbf{z}_0$ only depends on $\mathbf{x}_0$ and $\mathbf{x_1}$, and from Equation (6) a similar argument can be made for $\mathbf{z_1}$
+Now consider the conditional distribution over the two measurements $$ \mathbf{z}_0, \mathbf{z}_1 $$. From Equation (5) we know $$\mathbf{z}_0$$ only depends on $$\mathbf{x}_0$$ and $$\mathbf{x_1}$$, and from Equation (6) a similar argument can be made for $$\mathbf{z_1}$$
 
 $$
 \begin{align*}
