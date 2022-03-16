@@ -59,21 +59,17 @@ _styles: >
 
 ---
 
-**NOTE:**
-Citations, footnotes, and code blocks do not display correctly in the dark mode since distill does not support the dark mode by default.
-If you are interested in correctly adding dark mode support for distill, please open [a discussion](https://github.com/alshedivat/al-folio/discussions) and let us know.
-
 ## Introduction
 
-The problem of Simultaneous Localization and Mapping (SLAM) has a rich history in robotics dating back to 1986 <d-cite key="1638022"></d-cite>. Briefly, it is the problem of localizing -- locating -- the robot in an *unknown* map of the environment, a fundamental problem for any mobile robot. Since the location of the robot is specified against an unknown map, the localization typically takes the form of a piece-wise linear trajectory for the robot, as it moves around in the environment from its arbitrary origin. The map may be represented as a set of distinct landmarks (landmark-based SLAM) or as a dense representation of the environment such as a voxel map (dense SLAM).
+The problem of Simultaneous Localization and Mapping (SLAM) has a rich history in robotics dating back to 1986 <d-cite key="1638022"></d-cite>. Briefly, it is the problem of localizing -- locating -- the robot in an *unknown* map of the environment, a fundamental problem for any mobile robot. Since the location of the robot is specified against an unknown map, the localization task takes the form of estimating a piece-wise linear trajectory for the robot, as it moves around in the environment from its arbitrary origin. The map may be represented as a set of distinct landmarks (landmark-based SLAM) or as a dense representation of the environment such as a voxel map (dense SLAM).
 
 Most recent literature (post 2000s) partition the problem into the frontend and backend.
- - The front end of any system that tackles state estimation deals with processing and associating the raw sensor measurements. This results in a set of measurements associated with each to be estimated variable -- typically the robot and landmark poses.
+ - The front end of any system that tackles state estimation, deals with processing and associating the raw sensor measurements. This results in a set of measurements associated with each to-be-estimated variable -- typically the robot and landmark poses.
  - The back end is a sensor agnostic optimization framework that takes in the measurement(s) and produces the most likely estimate for each variable according to some notion of distance from the actual (unobserved) variable values.
 
 When all the variables to be estimated are Special Euclidean $$ \text{SE}(n) $$ poses, and the sensors generate relative pose measurements, the optimization problem is called Pose Graph Optimization (PGO) <d-cite key="carlone2015initialization"></d-cite> or Synchronization over the Special Euclidean Group <d-cite key="rosen2019se"></d-cite>. If all the variables are Special orthogonal $$ \text{SO}(n) $$ rotations, then the problem is also called rotation averaging <d-cite key="hartley2013rotation"></d-cite>.
 
-This article addresses with the backend optimization and motivates the problem formulation from first principles.
+This article addresses the backend optimization and motivates the problem formulation from first principles.
 
 ## Preliminaries
 
@@ -84,11 +80,18 @@ A random variable is an outcome of a random event. In our context, the act of me
 $$
 \begin{align}
 \mathbf{z} &= h(\mathbf{x}) + \nu \\
-\nu &\sim \mathcal{N}(0; \Sigma)
+\nu &\sim \mathcal{N}(0, \Sigma)
 \end{align}
 $$
 
-Here, equation (1) means that the state $$ \mathbf{x} $$ is transformed by a measurement function $h$ which is corrupted by inherent additive noise $$ \nu $$ in the sensor to produce a measurement $$\mathbf{z}$$. We model this noise $$\nu$$ as a random variable sampled from a Gaussian probability distribution.
+Here, equation (1) means that the state $$ \mathbf{x} $$ is transformed by a measurement function $$ h $$ which is corrupted by inherent additive noise $$ \nu $$ in the sensor to produce a measurement $$\mathbf{z}$$. We model this noise $$\nu$$ as a random variable sampled from a Gaussian probability distribution. If $$ h(\mathbf{x}) $$ were the underlying **true** measurement, then if we sample from the sensor, we get noise and probability distribution of the noise as follows
+
+$$
+\begin{align}
+\nu &\sim \mathbf{z} - h(\mathbf{x}) \\
+p(\nu) &= \frac{1}{\sqrt{2 \pi \Sigma}} \exp( \| \nu \|^2_{\Sigma} )
+\end{align}
+$$
 
 The choice of the probability distribution is rather curious. The Gaussian distribution is part of the exponential family of distributions, and has some convenient *algebraic* properties:
 1. It is fully described by its *sufficient* statistic. For instance, even though the Gaussian distribution has probability mass almost everywhere in its domain (infinite support), the distribution is fully described by its mean and covariance.
@@ -111,23 +114,23 @@ p(\mathbf{x}, \mathbf{y} | \mathbf{z}) = p(\mathbf{x} | \mathbf{z}) p(\mathbf{y}
 \end{align}
 $$
 
-Conditional independence in the context of SLAM is illustrated with the following example:
+Conditional independence in the context of SLAM is *hopefully* illustrated with the following example:
 
 Consider a robot in a one dimensional world as in Figure 1 (a).
-At time $$t_0$$, if we know the location $$\mathbf{x}_0$$ and $$\mathbf{x}_1$$, then the robot samples from the odometry sensor a measurement $$z_0$$ of (say 50.3 m) as follows
+At time $$ t_0 $$, if we know the location $$ \mathbf{x}_0 $$ and $$\mathbf{x}_1$$, then the robot samples from the odometry sensor a measurement $$\mathbf{z}_0$$ of (say 50.3 m) as follows
 
 $$
 \begin{align}
-z_0 \sim p_{\text{odometry}}(\mathbf{z}_0 | \mathbf{x}_0, \mathbf{x}_1)
+\mathbf{z}_0 \sim h_{\text{odometry}}(\mathbf{x}_0, \mathbf{x}_1) + \nu_{\text{odometry}}
 \end{align}
 $$
 
-Similarly, at time $$t=1$$, if we know that the robot is at 50 meters from origin, and then it samples from the range sensor two measurements $$z_1$$ and $$z_2$$ as follows:
+Similarly, at time $$ t=1 $$, if we know that the robot is at 50 meters from origin, and then it samples from the range sensor two measurements $$ \mathbf{z}_1 $$ and $$ \mathbf{z}_2 $$ as follows:
 
 $$
 \begin{align}
-z_1 \sim p_{\text{range}}(\mathbf{z}_1 | \mathbf{x}_1, \mathbf{l}_0) \\
-z_2 \sim p_{\text{range}}(\mathbf{z}_2 | \mathbf{x}_1, \mathbf{l}_1)
+\mathbf{z}_1 \sim h_{\text{range}}(\mathbf{x}_1, \mathbf{l}_0) + \nu_{\text{range}}\\
+\mathbf{z}_2 \sim h_{\text{range}}(\mathbf{x}_1, \mathbf{l}_1) + \nu_{\text{range}}
 \end{align}
 $$
 
@@ -140,13 +143,13 @@ $$
 Figure 1: (a) Illustration of a 1-D robot that observes two landmarks after moving forward by 50 meters at timestep 1. (b) Graphical model representation of the 1-D robot setting.
 </div>
 
-However, consider the selected portion of Figure 1(b) for simplicity. Here we see that, to sample a measurement, we need to sample from the joint distribution i.e., $$p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)$$.
+Next, consider the selected portion -- in dotted lines -- of Figure 1(b) for simplicity. Here we see that, to sample a measurement, we need to sample from the joint probability distribution i.e., $$p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)$$.
 
 $$
 p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) = p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) p(\mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) \\
 $$
 
-Now consider the conditional distribution over the two measurements $$ \mathbf{z}_0, \mathbf{z}_1 $$. From Equation (5) we know $$\mathbf{z}_0$$ only depends on $$\mathbf{x}_0$$ and $$\mathbf{x_1}$$, and from Equation (6) a similar argument can be made for $$\mathbf{z_1}$$
+Now consider the conditional distribution over the two measurements $$ \mathbf{z}_0, \mathbf{z}_1 $$. From Equation (5) and (4) we know $$ \mathbf{z}_0 $$ only depends on $$ \mathbf{x}_0 $$ and $$ \mathbf{x_1} $$, and from Equation (6) a similar argument can be made for $$ \mathbf{z_1} $$. Therefore we can safely assume the following:
 
 $$
 \begin{align*}
@@ -155,9 +158,21 @@ p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\m
 \end{align*}
 $$
 
-The above assumption of conditional independence between measurements given to-be-estimated state variables is key in reducing the complexity of estimation. It can also be observed that Figure 1(b) implicitly encodes the conditional independence between the measurements.
+The above assumption of conditional independence between measurements given state variables is key in reducing the complexity of estimation. It can also be observed that Figure 1(b) implicitly encodes the conditional independence between the measurements.
 
-## Equations
+### Filtering vs Smoothing
+
+Most methods prior to 2000s, were predominantly filtering methods. In fact, most courses [[1](/teaching/)] [[2](http://www.ipb.uni-bonn.de/robot-mapping/)] that deal with state estimation also start the course with filtering techniques.
+
+When a robot moves around in an environment, it's state space (the variables it estimates) grows, i.e., for every time-step a new pose variable needs to be estimated. Loosely speaking, filtering methods only update the variables at the current time step, while smoothing methods may update all variables, past and current. Chapter 3 and 4 of Probabilistic Robotics <d-cite key="thrun2002probabilistic"></d-cite> is a good treatment of Filtering methods relevant to the problem of SLAM.
+
+Here, I address Smoothing techniques.
+
+## MAP estimation over Factor Graphs
+
+### Why Factor Graphs?
+
+
 
 This theme supports rendering beautiful math in inline and display modes using [MathJax 3](https://www.mathjax.org/) engine.
 You just need to surround your math expression with `$$`, like `$$ E = mc^2 $$`.
