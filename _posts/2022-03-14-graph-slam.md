@@ -73,6 +73,14 @@ This article addresses the backend optimization and motivates the problem formul
 
 ## Preliminaries
 
+### Filtering vs Smoothing
+
+Most methods prior to 2000s, were predominantly filtering methods. In fact, most courses [[1](/teaching/)] [[2](http://www.ipb.uni-bonn.de/robot-mapping/)] that deal with state estimation also start the course with filtering techniques.
+
+When a robot moves around in an environment, it's state space (the variables it estimates) grows, i.e., for every time-step a new pose variable needs to be estimated. Loosely speaking, filtering methods only update the variables at the current time step, while smoothing methods may update all variables, past and current. Chapter 3 and 4 of Probabilistic Robotics <d-cite key="thrun2002probabilistic"></d-cite> is a good treatment of Filtering methods relevant to the problem of SLAM.
+
+Here, I address Smoothing techniques.
+
 ### Gaussian Random Variables
 
 A random variable is an outcome of a random event. In our context, the act of measurement is the random event, which produces an output that is a random variable. A classic instance that is cited in many books <d-cite key="thrun2002probabilistic"></d-cite> is the example of an odometry measurement. Perhaps due to wheel slip or inconsistent hall-effect, or some other physical property, the sensor measurement may be noisy (random). In most cases, we expect the sensor to reproduce measurements faithful to its underlying state, but many a time, it may not. This property may be mathematically modeled by a Gaussian random variable.
@@ -149,7 +157,7 @@ $$
 p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) = p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) p(\mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) \\
 $$
 
-Now consider the conditional distribution over the two measurements $$ \mathbf{z}_0, \mathbf{z}_1 $$. From Equation (5) and (4) we know $$ \mathbf{z}_0 $$ only depends on $$ \mathbf{x}_0 $$ and $$ \mathbf{x_1} $$, and from Equation (6) a similar argument can be made for $$ \mathbf{z_1} $$. Therefore we can safely assume the following:
+Now consider the conditional probability distribution over the two measurements $$ \mathbf{z}_0, \mathbf{z}_1 $$. From Equation (5) and (4) we know $$ \mathbf{z}_0 $$ only depends on $$ \mathbf{x}_0 $$ and $$ \mathbf{x_1} $$, and from Equation (6) a similar argument can be made for $$ \mathbf{z_1} $$. Therefore we can safely assume the following:
 
 $$
 \begin{align*}
@@ -159,14 +167,6 @@ p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\m
 $$
 
 The above assumption of conditional independence between measurements given state variables is key in reducing the complexity of estimation. It can also be observed that Figure 1(b) implicitly encodes the conditional independence between the measurements.
-
-### Filtering vs Smoothing
-
-Most methods prior to 2000s, were predominantly filtering methods. In fact, most courses [[1](/teaching/)] [[2](http://www.ipb.uni-bonn.de/robot-mapping/)] that deal with state estimation also start the course with filtering techniques.
-
-When a robot moves around in an environment, it's state space (the variables it estimates) grows, i.e., for every time-step a new pose variable needs to be estimated. Loosely speaking, filtering methods only update the variables at the current time step, while smoothing methods may update all variables, past and current. Chapter 3 and 4 of Probabilistic Robotics <d-cite key="thrun2002probabilistic"></d-cite> is a good treatment of Filtering methods relevant to the problem of SLAM.
-
-Here, I address Smoothing techniques.
 
 ## MAP estimation over Factor Graphs
 
