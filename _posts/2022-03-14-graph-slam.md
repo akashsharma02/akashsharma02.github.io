@@ -61,11 +61,11 @@ _styles: >
 
 ## Introduction
 
-The problem of Simultaneous Localization and Mapping (SLAM) has a rich history in robotics dating back to 1986 <d-cite key="1638022"></d-cite>. Briefly, it is the problem of localizing -- locating -- the robot in an *unknown* map of the environment, a fundamental problem for any mobile robot. Since the location of the robot is specified against an unknown map, the localization task takes the form of estimating a piece-wise linear trajectory for the robot, as it moves around in the environment from its arbitrary origin. The map may be represented as a set of distinct landmarks (landmark-based SLAM) or as a dense representation of the environment such as a voxel map (dense SLAM).
+The problem of Simultaneous Localization and Mapping (SLAM) has a rich history in robotics dating back to 1986 <d-cite key="1638022"></d-cite>. Briefly, it is the problem of localizing -- locating -- the robot in an *unknown* map of the environment, a fundamental problem for any mobile robot. Since the location of the robot is specified against an unknown map, the localization task takes the form of estimating a piece-wise linear trajectory for the robot, as it moves around in the environment from its arbitrary origin. The map may be represented as a set of distinct landmarks (called landmark-based SLAM) or as a dense representation of the environment such as a voxel map (called dense SLAM).
 
 Most recent literature (post 2000s) partition the problem into the frontend and backend.
- - The front end of any system that tackles state estimation, deals with processing and associating the raw sensor measurements. This results in a set of measurements associated with each to-be-estimated variable -- typically the robot and landmark poses.
- - The back end is a sensor agnostic optimization framework that takes in the measurement(s) and produces the most likely estimate for each variable according to some notion of distance from the actual (unobserved) variable values.
+ - The front end of any SLAM system that tackles state estimation, deals with processing and associating the raw sensor measurements. This results in a set of measurements associated with each to-be-estimated variable -- typically the robot and landmark poses.
+ - The back end is a *sensor agnostic* optimization framework that takes in the measurement(s) and produces the most likely estimate for each variable according to some notion of distance from the actual (unobserved) variable values.
 
 When all the variables to be estimated are Special Euclidean $$ \text{SE}(n) $$ poses, and the sensors generate relative pose measurements, the optimization problem is called Pose Graph Optimization (PGO) <d-cite key="carlone2015initialization"></d-cite> or Synchronization over the Special Euclidean Group <d-cite key="rosen2019se"></d-cite>. If all the variables are Special orthogonal $$ \text{SO}(n) $$ rotations, then the problem is also called rotation averaging <d-cite key="hartley2013rotation"></d-cite>.
 
@@ -75,15 +75,15 @@ This article addresses the backend optimization and motivates the problem formul
 
 ### Filtering vs Smoothing
 
-Most methods prior to 2000s, were predominantly filtering methods. In fact, most courses [[1](/teaching/)] [[2](http://www.ipb.uni-bonn.de/robot-mapping/)] that deal with state estimation also start the course with filtering techniques.
+Most methods prior to 2000s were predominantly filtering methods. In fact, most courses [[1](/teaching/)] [[2](http://www.ipb.uni-bonn.de/robot-mapping/)] that deal with state estimation also start the course with filtering techniques.
 
-When a robot moves around in an environment, it's state space (the variables it estimates) grows, i.e., for every time-step a new pose variable needs to be estimated. Loosely speaking, filtering methods only update the variables at the current time step, while smoothing methods may update all variables, past and current. Chapter 3 and 4 of Probabilistic Robotics <d-cite key="thrun2002probabilistic"></d-cite> is a good treatment of Filtering methods relevant to the problem of SLAM.
+When a robot moves around in an environment, it's state space (the variables it estimates) grows, i.e., for every time-step, a new pose variable needs to be estimated. Loosely speaking, filtering methods only update the variables at the current time step, while smoothing methods *may* update all the variables, past and current. Chapter 3 and 4 of Probabilistic Robotics <d-cite key="thrun2002probabilistic"></d-cite> is a good treatment of Filtering methods relevant to the problem of SLAM.
 
 Here, I address Smoothing techniques.
 
 ### Gaussian Random Variables
 
-A random variable is an outcome of a random event. In our context, the act of measurement is the random event, which produces an output that is a random variable. A classic instance that is cited in many books <d-cite key="thrun2002probabilistic"></d-cite> is the example of an odometry measurement. Perhaps due to wheel slip or inconsistent hall-effect, or some other physical property, the sensor measurement may be noisy (random). In most cases, we expect the sensor to reproduce measurements faithful to its underlying state, but many a time, it may not. This property may be mathematically modeled by a Gaussian random variable.
+A random variable is an outcome of a random event, and has an associated probability distribution. In our context, the act of measurement is the random event, which produces an output that is a random variable. A classic instance that is cited in many books <d-cite key="thrun2002probabilistic"></d-cite> is the example of an odometry measurement. Perhaps due to wheel slip or inconsistent hall-effect, or some other physical property, the sensor measurement may be noisy (random). In most cases, we expect the sensor to reproduce measurements faithful to its underlying state, but many a time, it may not. This property may be mathematically modeled by a Gaussian random variable.
 
 $$
 \begin{align}
@@ -92,7 +92,7 @@ $$
 \end{align}
 $$
 
-Here, equation (1) means that the state $$ \mathbf{x} $$ is transformed by a measurement function $$ h $$ which is corrupted by inherent additive noise $$ \nu $$ in the sensor to produce a measurement $$\mathbf{z}$$. We model this noise $$\nu$$ as a random variable sampled from a Gaussian probability distribution. If $$ h(\mathbf{x}) $$ were the underlying **true** measurement, then if we sample from the sensor, we get noise and probability distribution of the noise as follows
+Here, equation (1) means that the state $$ \mathbf{x} $$ is transformed by a measurement function $$ h $$ which is corrupted by inherent additive noise $$ \nu $$ in the sensor to produce a measurement $$\mathbf{z}$$. We model this noise $$\nu$$ as a random variable sampled from a Gaussian probability distribution. If $$ h(\mathbf{x}) $$ were the *true* underlying measurement, then if we sampled from the sensor, we get noise added to the measurement and probability distribution of the noise as follows
 
 $$
 \begin{align}
@@ -101,13 +101,23 @@ p(\nu) &= \frac{1}{\sqrt{2 \pi \Sigma}} \exp( \| \nu \|^2_{\Sigma} )
 \end{align}
 $$
 
+
+<div class="row">
+    <div class="col-sm mt-3 mt-md-0" align=center>
+        {% include figure.html path="assets/img/normal-distribution-pdf.svg" title="Gaussian probability distribution" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+Figure 1: The Normal distribution or the Gaussian probability distribution illustrated with different means ($ \mu $) and variances ($ \sigma^2 $). Image taken ingloriously from Wikipedia.
+</div>
+
 The choice of the probability distribution is rather curious. The Gaussian distribution is part of the exponential family of distributions, and has some convenient *algebraic* properties:
 1. It is fully described by its *sufficient* statistic. For instance, even though the Gaussian distribution has probability mass almost everywhere in its domain (infinite support), the distribution is fully described by its mean and covariance.
 2. The product of Gaussian distributions results in another Gaussian distribution i.e., the conjugate prior of a Gaussian distribution is another Gaussian.
 
 ### Conditional Independence of Random variables
 
-In Probability theory, two random variables $$\mathbf{x}$$ and $$\mathbf{y}$$ are said to be independent, if their joint distribution equals the product of their probabilities. Intuitively, it means that if the value of $$\mathbf{x}$$ is observed, then the probability of $$\mathbf{y}$$ is unaffected.
+In Probability theory, two random variables $$\mathbf{x}$$ and $$\mathbf{y}$$ are said to be independent, if their joint distribution equals the product of their probabilities. Intuitively, it means that if the value of the random variable $$\mathbf{x}$$ is observed, then the probability of $$\mathbf{y}$$ is unaffected:
 
 $$
 \begin{align}
@@ -122,9 +132,11 @@ p(\mathbf{x}, \mathbf{y} | \mathbf{z}) = p(\mathbf{x} | \mathbf{z}) p(\mathbf{y}
 \end{align}
 $$
 
-Conditional independence in the context of SLAM is *hopefully* illustrated with the following example:
+Conditional independence in the context of SLAM is *hopefully* illustrated with the following example.
 
-Consider a robot in a one dimensional world as in Figure 1 (a).
+#### Example 1:
+
+Consider a robot in a one-dimensional world as in Figure 2 (a).
 At time $$ t_0 $$, if we know the location $$ \mathbf{x}_0 $$ and $$\mathbf{x}_1$$, then the robot samples from the odometry sensor a measurement $$\mathbf{z}_0$$ of (say 50.3 m) as follows
 
 $$
@@ -148,16 +160,17 @@ $$
     </div>
 </div>
 <div class="caption">
-Figure 1: (a) Illustration of a 1-D robot that observes two landmarks after moving forward by 50 meters at timestep 1. (b) Graphical model representation of the 1-D robot setting.
+Figure 2: Illustration of a 1-D robot that observes two landmarks after moving forward by 50 meters at timestep 1.
 </div>
+Figure 3(a) is a graphical representation of the above robot, where the state variables are denoted with large circles annotated with variable names, and measurements are denoted with edges with a filled dot.
 
-Next, consider the selected portion -- in dotted lines -- of Figure 1(b) for simplicity. Here we see that, to sample a measurement, we need to sample from the joint probability distribution i.e., $$p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0)$$.
+Next, consider the selected portion -- in dotted lines -- of Figure 3(a) for simplicity. Here we see that, to sample measurements $\mathbf{z}_0$ and $\mathbf{z}_1$, we need to sample from the joint probability distribution i.e., $$ p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) $$.
 
 $$
 p(\mathbf{z}_0, \mathbf{z}_1, \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) = p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) p(\mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) \\
 $$
 
-Now consider the conditional probability distribution over the two measurements $$ \mathbf{z}_0, \mathbf{z}_1 $$. From Equation (5) and (4) we know $$ \mathbf{z}_0 $$ only depends on $$ \mathbf{x}_0 $$ and $$ \mathbf{x_1} $$, and from Equation (6) a similar argument can be made for $$ \mathbf{z_1} $$. Therefore we can safely assume the following:
+Now consider the conditional distribution over the two measurements $$ \mathbf{z}_0, \mathbf{z}_1 $$. From Equation (6) and (7) we know $$ \mathbf{z}_0 $$ only depends on $$ \mathbf{x}_0 $$ and $$ \mathbf{x_1} $$, and from Equation (8) a similar argument can be made for $$ \mathbf{z_1} $$. Therefore, we can safely *assume* the following:
 
 $$
 \begin{align*}
@@ -166,226 +179,20 @@ p(\mathbf{z}_0, \mathbf{z}_1 | \mathbf{x}_0, \mathbf{x}_1, \mathbf{l}_0) &= p(\m
 \end{align*}
 $$
 
-The above assumption of conditional independence between measurements given state variables is key in reducing the complexity of estimation. It can also be observed that Figure 1(b) implicitly encodes the conditional independence between the measurements.
-
-## MAP estimation over Factor Graphs
+The above assumption of conditional independence between measurements given state variables is key in reducing the complexity of estimation.
 
 ### Why Factor Graphs?
 
+Factor graphs are bipartite graphs -- graphs containing two types of random variables -- that describe the factorization of a probability distribution. Factorizing a joint probability distribution amounts to finding the subsets of random variables that are conditionally independent of each other and therefore be written as a product.
 
+For example 1, Figure 3(a) concisely represented the factorization of the joint probability distribution between all the random variables.
 
-This theme supports rendering beautiful math in inline and display modes using [MathJax 3](https://www.mathjax.org/) engine.
-You just need to surround your math expression with `$$`, like `$$ E = mc^2 $$`.
-If you leave it inside a paragraph, it will produce an inline expression, just like $$ E = mc^2 $$.
-
-To use display mode, again surround your expression with `$$` and place it as a separate paragraph.
-Here is an example:
-
-$$
-\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
-$$
-
-Note that MathJax 3 is [a major re-write of MathJax](https://docs.mathjax.org/en/latest/upgrading/whats-new-3.0.html) that brought a significant improvement to the loading and rendering speed, which is now [on par with KaTeX](http://www.intmath.com/cg5/katex-mathjax-comparison.php).
-
-
-***
-
-## Citations
-
-Citations are then used in the article body with the `<d-cite>` tag.
-The key attribute is a reference to the id provided in the bibliography.
-The key attribute can take multiple ids, separated by commas.
-
-The citation is presented inline like this: <d-cite key="gregor2015draw"></d-cite> (a number that displays more information on hover).
-If you have an appendix, a bibliography is automatically created and populated in it.
-
-Distill chose a numerical inline citation style to improve readability of citation dense articles and because many of the benefits of longer citations are obviated by displaying more information on hover.
-However, we consider it good style to mention author last names if you discuss something at length and it fits into the flow well — the authors are human and it’s nice for them to have the community associate them with their work.
-
-***
-
-## Footnotes
-
-Just wrap the text you would like to show up in a footnote in a `<d-footnote>` tag.
-The number of the footnote will be automatically generated.<d-footnote>This will become a hoverable footnote.</d-footnote>
-
-***
-
-## Code Blocks
-
-Syntax highlighting is provided within `<d-code>` tags.
-An example of inline code snippets: `<d-code language="html">let x = 10;</d-code>`.
-For larger blocks of code, add a `block` attribute:
-
-<d-code block language="javascript">
-  var x = 25;
-  function(x) {
-    return x * x;
-  }
-</d-code>
-
-**Note:** `<d-code>` blocks do not look well in the dark mode.
-You can always use the default code-highlight using the `highlight` liquid tag:
-
-{% highlight javascript %}
-var x = 25;
-function(x) {
-  return x * x;
-}
-{% endhighlight %}
-
-***
-
-## Layouts
-
-The main text column is referred to as the body.
-It is the assumed layout of any direct descendants of the `d-article` element.
-
-<div class="fake-img l-body">
-  <p>.l-body</p>
+<div class="row">
+    <div class="col-sm mt-3 mt-md-0" align=center>
+        {% include figure.html path="assets/img/bipartite-graph.png" title="Bipartite graph" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+Figure 3: (a) Factor Graph representation for Example 1.  (b) Equivalent factor graph illustrating the bipartite nature of the graph
 </div>
 
-For images you want to display a little larger, try `.l-page`:
-
-<div class="fake-img l-page">
-  <p>.l-page</p>
-</div>
-
-All of these have an outset variant if you want to poke out from the body text a little bit.
-For instance:
-
-<div class="fake-img l-body-outset">
-  <p>.l-body-outset</p>
-</div>
-
-<div class="fake-img l-page-outset">
-  <p>.l-page-outset</p>
-</div>
-
-Occasionally you’ll want to use the full browser width.
-For this, use `.l-screen`.
-You can also inset the element a little from the edge of the browser by using the inset variant.
-
-<div class="fake-img l-screen">
-  <p>.l-screen</p>
-</div>
-<div class="fake-img l-screen-inset">
-  <p>.l-screen-inset</p>
-</div>
-
-The final layout is for marginalia, asides, and footnotes.
-It does not interrupt the normal flow of `.l-body` sized text except on mobile screen sizes.
-
-<div class="fake-img l-gutter">
-  <p>.l-gutter</p>
-</div>
-
-***
-
-## Other Typography
-
-Emphasis, aka italics, with *asterisks* (`*asterisks*`) or _underscores_ (`_underscores_`).
-
-Strong emphasis, aka bold, with **asterisks** or __underscores__.
-
-Combined emphasis with **asterisks and _underscores_**.
-
-Strikethrough uses two tildes. ~~Scratch this.~~
-
-1. First ordered list item
-2. Another item
-⋅⋅* Unordered sub-list.
-1. Actual numbers don't matter, just that it's a number
-⋅⋅1. Ordered sub-list
-4. And another item.
-
-⋅⋅⋅You can have properly indented paragraphs within list items. Notice the blank line above, and the leading spaces (at least one, but we'll use three here to also align the raw Markdown).
-
-⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅
-⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅
-⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
-
-* Unordered list can use asterisks
-- Or minuses
-+ Or pluses
-
-[I'm an inline-style link](https://www.google.com)
-
-[I'm an inline-style link with title](https://www.google.com "Google's Homepage")
-
-[I'm a reference-style link][Arbitrary case-insensitive reference text]
-
-[I'm a relative reference to a repository file](../blob/master/LICENSE)
-
-[You can use numbers for reference-style link definitions][1]
-
-Or leave it empty and use the [link text itself].
-
-URLs and URLs in angle brackets will automatically get turned into links.
-http://www.example.com or <http://www.example.com> and sometimes
-example.com (but not on Github, for example).
-
-Some text to show that the reference links can follow later.
-
-[arbitrary case-insensitive reference text]: https://www.mozilla.org
-[1]: http://slashdot.org
-[link text itself]: http://www.reddit.com
-
-Here's our logo (hover to see the title text):
-
-Inline-style:
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
-
-Reference-style:
-![alt text][logo]
-
-[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"
-
-Inline `code` has `back-ticks around` it.
-
-```javascript
-var s = "JavaScript syntax highlighting";
-alert(s);
-```
-
-```python
-s = "Python syntax highlighting"
-print s
-```
-
-```
-No language indicated, so no syntax highlighting.
-But let's throw in a <b>tag</b>.
-```
-
-Colons can be used to align columns.
-
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-
-There must be at least 3 dashes separating each header cell.
-The outer pipes (|) are optional, and you don't need to make the
-raw Markdown line up prettily. You can also use inline Markdown.
-
-Markdown | Less | Pretty
---- | --- | ---
-*Still* | `renders` | **nicely**
-1 | 2 | 3
-
-> Blockquotes are very handy in email to emulate reply text.
-> This line is part of the same quote.
-
-Quote break.
-
-> This is a very long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote.
-
-
-Here's a line for us to start with.
-
-This line is separated from the one above by two newlines, so it will be a *separate paragraph*.
-
-This line is also a separate paragraph, but...
-This line is only separated by a single newline, so it's a separate line in the *same paragraph*.
