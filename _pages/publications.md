@@ -3,7 +3,7 @@ layout: page
 permalink: /publications/
 title: publications
 description: Publications and Theses
-years: [2021]
+years: [2022, 2021]
 nav: true
 ---
 <!-- _pages/publications.md -->
