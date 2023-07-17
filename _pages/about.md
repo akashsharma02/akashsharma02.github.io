@@ -20,8 +20,8 @@ social: true  # includes social icons at the bottom of the page
 ---
 Hey there!
 
-I am a Ph.D. student at Carnegie Mellon University (CMU).  My research focuses on long term robotic mapping and 3D reconstruction for scene understanding through graph-based SLAM. At CMU, I am fortunate to be advised by <a href="https://cs.cmu.edu/~kaess">Prof. Michael Kaess</a>.
+I am a Ph.D. student at Carnegie Mellon University (CMU).  My research focuses on long term robotic mapping and 3D reconstruction for scene understanding through graph-based SLAM. At CMU, I am fortunate to be advised by <a href="https://cs.cmu.edu/~kaess">Prof. Michael Kaess</a> and collaborate with <a href="https://shubhtuls.github.io/">Shubham Tulsiani</a>.
 
-I graduated with a Masters from CMU recently. Before joining CMU, I spent two years as a Software Engineer at Infinera, where I helped build infrastructure for fault-tolerant optical communications, that manages long-haul internet traffic. I received a Bachelor's degree in Engineering from Sri Jayachamarajendra College of Engineering (SJCE) in 2017.
+I graduated with a Masters in Robotics from CMU (<a href='assets/pdf/msr_thesis.pdf'>Thesis</a>). Before joining CMU, I spent two years as a Software Engineer at Infinera, where I helped build infrastructure for fault-tolerant optical communications, that manages long-haul internet traffic. I received a Bachelor's degree in Engineering from Sri Jayachamarajendra College of Engineering (SJCE).
 
-I'm a <img src="{{ '/assets/img/Icon-Vim.svg' | relative_url }}" width="20"/> enthusiast, my lua configuration is available [here](https://github.com/akashsharma02/neovim-config/). I also enjoy mechanical keyboards, and I am currently building the [Sofle Keyboard](https://josefadamcik.github.io/SofleKeyboard/).
+I'm a <img src="{{ '/assets/img/Icon-Vim.svg' | relative_url }}" width="20"/> enthusiast, my lua configuration is available [here](https://github.com/akashsharma02/neovim-config/). I also enjoy mechanical keyboards, and I currently use a custom built keyboard [Sofle Keyboard](https://josefadamcik.github.io/SofleKeyboard/).
