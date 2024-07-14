@@ -117,10 +117,13 @@
           {% endif %}
           {% if site.cv_pdf_only %}
             <!-- Search -->
-            <li class="nav-item">
-              <button id="search-toggle" title="Search" onclick="openSearchModal()">
-                <span class="nav-link">ctrl k <i class="ti ti-search"></i></span>
-              </button>
+            <li class="nav-item {% if page.title == 'cv' %}active{% endif %}">
+                <a class="nav-link" href="{{ 'assets/pdf/resume.pdf' | relative_url }}">
+                    cv
+                    {% if page.title == "cv" %}
+                    <span class="sr-only">(current)</span>
+                    {% endif %}
+                </a>
             </li>
           {% endif %}
           {% if site.enable_darkmode %}
