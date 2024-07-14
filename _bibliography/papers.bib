@@ -1,114 +1,104 @@
 ---
 ---
-
-@string{aps = {American Physical Society,}}
-
-@book{einstein1920relativity,
-  title={Relativity: the Special and General Theory},
-  author={Einstein, Albert},
-  year={1920},
-  publisher={Methuen & Co Ltd},
-  html={relativity.html}
+---
+---
+@inproceedings{Chang_2023_ICCV,
+    abbr = {ICCV},
+    pdf = {Chang23iccv.pdf},
+    author    = {Chang, MingFang and Sharma, Akash and Kaess, Michael and Lucey, Simon},
+    title     = {Neural Radiance Field with LiDAR maps},
+    abstract  = {We address outdoor Neural Radiance Fields (NeRF) with LiDAR maps. 
+                 Existing NeRF methods usually require specially collected hypersampled source views 
+                 and do not perform well with the open source camera-LiDAR datasets - significantly limiting 
+                 the approach's practical utility. In this paper, we demonstrate an approach that allows for 
+                 these datasets to be utilized for high quality neural renderings. Our design leverages 
+                 1) LiDAR sensors for strong 3D geometry priors that significantly improve the ray sampling locality, 
+                 and 2) Conditional Adversarial Networks (cGANs) to recover image details since aggregating 
+                 embeddings from imperfect LiDAR maps causes artifacts in the synthesized images. 
+                 Our experiments show that while NeRF baselines produce either noisy or blurry results on Argoverse 2, 
+                 the images synthesized by our system not only outperform baselines in image quality metrics under both 
+                 clean and noisy conditions, but also obtain closer Detectron2 results to the ground truth images. Furthermore, 
+                 to show the substantial applicability of our system, we demonstrate that our system can be used in 
+                 data augmentation for training a pose regression network and multi-season view synthesis. 
+                 Our dataset and code will be released.},
+    booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+    month     = {October},
+    year      = {2023},
+    pages     = {17914-17923}
 }
 
-@book{einstein1956investigations,
-  bibtex_show={true},
-  title={Investigations on the Theory of the Brownian Movement},
-  author={Einstein, Albert},
-  year={1956},
-  publisher={Courier Corporation},
-  preview={brownian-motion.gif}
+@inproceedings{Xu22iros,
+    abbr = {IROS},
+    pdf = {Xu22iros.pdf},
+    author = {R. Xu and W. Dong and A. Sharma and M. Kaess},
+    title = {Learned Depth Estimation of {3D} Imaging Radar for Indoor Mapping},
+    abstract = {3D imaging radar offers robust perception capability through
+                visually demanding environments due to the unique penetrative and
+                reflective properties of millimeter waves (mmWave). Current
+                approaches for 3D perception with imaging radar require knowledge
+                of environment geometry, accumulation of data from multiple
+                frames for perception, or access to between-frame motion. Imaging
+                radar presents an additional difficulty due to the complexity of
+                its data representation. To address these issues, and make
+                imaging radar easier to use for downstream robotics tasks, we
+                propose a learning-based method that regresses radar measurements
+                into cylindrical depth maps using LiDAR supervision. Due to the
+                limitation of the regression formulation, directions where the
+                radar beam could not reach will still generate a valid depth. To
+                address this issue, our method additionally learns a 3D filter to
+                remove those pixels. Experiments show that our system generates
+                visually accurate depth estimation. Furthermore, we confirm the
+                overall ability to generalize in the indoor scene using the
+                estimated depth for probabilistic occupancy mapping with ground
+                truth trajectory.},
+    booktitle = {Proc. IEEE/RSJ Intl. Conf. on Intelligent Robots and Systems,
+                 IROS},
+    address = {Kyoto, Japan},
+    month = oct,
+    year = {2022},
+    pages={13260-13267},
 }
 
-@article{einstein1950meaning,
-  abbr={AJP},
-  bibtex_show={true},
-  title={The meaning of relativity},
-  author={Einstein, Albert and Taub, AH},
-  journal={American Journal of Physics},
-  volume={18},
-  number={6},
-  pages={403--404},
-  year={1950},
-  publisher={American Association of Physics Teachers}
+@inproceedings{Sharma21icra,
+    abbr = {ICRA},
+    selected = {true},
+    pdf = {Sharma21icra.pdf},
+    code = {https://github.com/rpl-cmu/object-slam},
+    teaser = {object_slam.gif},
+    author = {A. Sharma and W. Dong and M. Kaess},
+    title = {Compositional and Scalable Object {SLAM}},
+    abstract = {We present a fast, scalable, and accurate Simultaneous
+                Localization and Mapping (SLAM) system that represents indoor
+                scenes as a graph of objects. Leveraging the observation that
+                artificial environments are structured and occupied by
+                recognizable objects, we show that a compositional and scalable
+                object mapping formulation is amenable to a robust SLAM solution
+                for drift-free large-scale indoor reconstruction. To achieve this
+                , we propose a novel semantically assisted data association
+                strategy that results in unambiguous persistent object landmarks
+                and a 2.5D compositional rendering method that enables reliable
+                frame-to-model RGB-D tracking. Consequently, we deliver an
+                optimized online implementation that can run at near frame rate
+                with a single graphics card, and provide a comprehensive
+                evaluation against state-of-the-art baselines. An open-source
+                implementation will be provided at
+                https://github.com/rpl-cmu/object-slam.},
+    booktitle = {Proc. IEEE Intl. Conf. on Robotics and Automation, ICRA},
+    address = {Xi'an, China},
+    month = may,
+    year = {2021},
 }
 
-@article{PhysRev.47.777,
-  abbr={PhysRev},
-  title={Can Quantum-Mechanical Description of Physical Reality Be Considered Complete?},
-  author={Einstein*†, A. and Podolsky*, B. and Rosen*, N.},
-  abstract={In a complete theory there is an element corresponding to each element of reality. A sufficient condition for the reality of a physical quantity is the possibility of predicting it with certainty, without disturbing the system. In quantum mechanics in the case of two physical quantities described by non-commuting operators, the knowledge of one precludes the knowledge of the other. Then either (1) the description of reality given by the wave function in quantum mechanics is not complete or (2) these two quantities cannot have simultaneous reality. Consideration of the problem of making predictions concerning a system on the basis of measurements made on another system that had previously interacted with it leads to the result that if (1) is false then (2) is also false. One is thus led to conclude that the description of reality as given by a wave function is not complete.},
-  journal={Phys. Rev.},
-  location={New Jersey},
-  volume={47},
-  issue={10},
-  pages={777--780},
-  numpages={0},
-  year={1935},
-  month={May},
-  publisher=aps,
-  doi={10.1103/PhysRev.47.777},
-  url={http://link.aps.org/doi/10.1103/PhysRev.47.777},
-  html={https://journals.aps.org/pr/abstract/10.1103/PhysRev.47.777},
-  pdf={example_pdf.pdf},
-  altmetric={248277},
-  dimensions={true},
-  google_scholar_id={qyhmnyLat1gC},
-  video={https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ},
-  additional_info={. *More Information* can be [found here](https://github.com/alshedivat/al-folio/)},
-  annotation={* Example use of superscripts<br>† Albert Einstein},
-  selected={true}
-}
-
-@article{einstein1905molekularkinetischen,
-  title={{\"U}ber die von der molekularkinetischen Theorie der W{\"a}rme geforderte Bewegung von in ruhenden Fl{\"u}ssigkeiten suspendierten Teilchen},
-  author={Einstein, A.},
-  journal={Annalen der physik},
-  volume={322},
-  number={8},
-  pages={549--560},
-  year={1905},
-  publisher={Wiley Online Library}
-}
-
-@article{einstein1905movement,
-  abbr={Ann. Phys.},
-  title={Un the movement of small particles suspended in statiunary liquids required by the molecular-kinetic theory 0f heat},
-  author={Einstein, A.},
-  journal={Ann. Phys.},
-  volume={17},
-  pages={549--560},
-  year={1905}
-}
-
-@article{einstein1905electrodynamics,
-  title={On the electrodynamics of moving bodies},
-  author={Einstein, A.},
-  year={1905}
-}
-
-@Article{einstein1905photoelectriceffect,
-  bibtex_show={true},
-  abbr={Ann. Phys.},
-  title="{{\"U}ber einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt}",
-  author={Albert Einstein},
-  abstract={This is the abstract text.},
-  journal={Ann. Phys.},
-  volume={322},
-  number={6},
-  pages={132--148},
-  year={1905},
-  doi={10.1002/andp.19053220607},
-  award={Albert Einstein receveid the **Nobel Prize in Physics** 1921 *for his services to Theoretical Physics, and especially for his discovery of the law of the photoelectric effect*},
-  award_name={Nobel Prize}
-}
-
-@book{przibram1967letters,
-  bibtex_show={true},
-  title={Letters on wave mechanics},
-  author={Einstein, Albert and Schrödinger, Erwin and Planck, Max and Lorentz, Hendrik Antoon and Przibram, Karl},
-  year={1967},
-  publisher={Vision},
-  preview={wave-mechanics.gif},
-  abbr={Vision}
+@thesis{Akash-Sharma-2021-127395,
+    abbr = {M.S.},
+    author = {Akash Sharma},
+    pdf = {msr_thesis.pdf},
+    title = {Incorporating Semantic Structure in SLAM},
+    year = {2021},
+    month = {May},
+    school = {Carnegie Mellon University},
+    address = {Pittsburgh, PA},
+    number = {CMU-RI-TR-21-18},
+    keywords = {Semantic SLAM, SLAM, Instance Segmentation, Dense reconstruction
+                },
 }
