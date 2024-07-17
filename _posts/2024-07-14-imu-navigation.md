@@ -82,7 +82,9 @@ Elements of the Lie Group can act on elements from other sets. For example, a un
 
 ### Tangent space and the Lie Algebra
 
-Let $$\mathcal{X}(t)$$ be a point on the Lie manifold $$\mathcal{M}$$ then $$\dot{\mathcal{X}} = \frac{d\mathcal{X}}{dt}$$ belongs to its tangent space at $$\mathcal{X}$$
+Let $$\mathcal{X}(t)$$ be a point on the Lie manifold $$\mathcal{M}$$ then $$\dot{\mathcal{X}} = \frac{d\mathcal{X}}{dt}$$ belongs to its tangent space at $$\mathcal{X}$$ (or linearized at $$\mathcal{X}$$) denoted as $$T_\mathcal{X}\mathcal{M}$$. Since we note that the lie group has the same curvature throughout the manifold, the tangent space $$T_{\mathcal{X}}\mathcal{M}$$ also has the same structure everywhere. 
+
+The Lie Algebra simply is the tangent space of a Lie group -- linearized -- at the identity element $$\mathcal{E}$$ of the group. Every Lie group $$\mathcal{M}$$ has an associated lie algebra $$\mathfrak{m}$$. The Lie algebra $$\mathfrak{m}$$ is a vector space
 
 $$\mathbf{SO(2)}$$ algebra example
 

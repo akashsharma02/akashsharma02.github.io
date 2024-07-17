@@ -1,9 +1,15 @@
-"AJP":
-  url: https://aapt.scitation.org/journal/ajp
-  color: "#00369f"
+"ICCV":
+  url: https://iccv2023.thecvf.com/ 
+  # color: "#00369f"
 
 "PhysRev":
   url: https://journals.aps.org/
 
 "Vision":
   color: "#009f36"
+
+"ICRA":
+  url: https://www.ieee-ras.org/conferences-workshops/fully-sponsored/icra
+
+"IROS":
+  url: https://www.ieee-ras.org/conferences-workshops/financially-co-sponsored/iros

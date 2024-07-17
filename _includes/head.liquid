@@ -29,10 +29,8 @@
   type="text/css"
   href="{{ site.third_party_libraries.google_fonts.url.fonts }}"
 >
-<link defer rel="stylesheet" href="{{ '/assets/fonts/sans/cmun-sans.css' | relative_url | bust_file_cache }}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Source+Sans+3:wght@200..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+{% comment %} <link defer rel="stylesheet" href="{{ '/assets/fonts/sans/cmun-sans.css' | relative_url | bust_file_cache }}"> {% endcomment %}
+<link defer rel="stylesheet" href="{{ '/assets/fonts/cmu_bright/cmun-bright.css' | relative_url | bust_file_cache }}">
 
 <!-- Code Syntax Highlighting -->
 <link
