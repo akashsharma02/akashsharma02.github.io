@@ -82,6 +82,8 @@ Elements of the Lie Group can act on elements from other sets. For example, a un
 
 ### Tangent space and the Lie Algebra
 
+Let $$\mathcal{X}(t)$$ be a point on the Lie manifold $$\mathcal{M}$$ then $$\dot{\mathcal{X}} = \frac{d\mathcal{X}}{dt}$$ belongs to its tangent space at $$\mathcal{X}$$
+
 $$\mathbf{SO(2)}$$ algebra example
 
 ### $$\mathbf{Exp}$$ and $$\mathbf{Log}$$ map
