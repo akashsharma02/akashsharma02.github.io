@@ -19,7 +19,7 @@ pagination:
 <div class="post">
 
 {% assign blog_name_size = site.blog_name | size %}
-{% assign blog_description_size = site.blog_description | size %}
+<!-- {% assign blog_description_size = site.blog_description | size %} -->
 
 {% if blog_name_size > 0 or blog_description_size > 0 %}
 

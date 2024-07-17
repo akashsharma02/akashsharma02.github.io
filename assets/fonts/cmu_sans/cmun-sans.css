@@ -18,7 +18,7 @@
 		 url('cmunsx.ttf') format('truetype'),
 		 url('cmunsx.svg#cmunsx') format('svg');
 	font-weight: bold;
-	font-style: normal;
+	font-style: bold;
 }
 
 
@@ -43,5 +43,9 @@
 		 url('cmunso.svg#cmunso') format('svg');
 	font-weight: bold;
 	font-style: italic;
+}
+
+body {
+	font-family: 'Computer Modern Sans', sans-serif;
 }
 

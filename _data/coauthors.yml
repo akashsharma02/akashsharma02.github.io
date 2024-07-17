@@ -1,34 +1,19 @@
-"adams":
-  - firstname: ["Edwin", "E.", "E. P.", "Edwin Plimpton"]
-    url: https://en.wikipedia.org/wiki/Edwin_Plimpton_Adams
+"chang":
+  - firstname: ["MingFang", "Ming", "MingFang Chang", "Chang, MingFang"]
+    url: https://alliecc.github.io/
 
-"podolsky":
-  - firstname: ["Boris", "B.", "B. Y.", "Boris Yakovlevich"]
-    url: https://en.wikipedia.org/wiki/Boris_Podolsky
+"kaess":
+  - firstname: ["Michael", "M.", "Michael Kaess"]
+    url: https://cs.cmu.edu/~kaess
 
-"rosen":
-  - firstname: ["Nathan", "N."]
-    url: https://en.wikipedia.org/wiki/Nathan_Rosen
+"dong":
+  - firstname: ["Wei", "Wei Dong", "Dong, Wei", ]
+    url: https://dongwei.info/ 
 
-"bach":
-  - firstname: ["Johann Sebastian", "J. S."]
-    url: https://en.wikipedia.org/wiki/Johann_Sebastian_Bach
+"lucey":
+  - firstname: ["Simon", "S.", "Simon Lucey"]
+    url: https://www.ri.cmu.edu/ri-people/simon-lucey/
 
-  - firstname: ["Carl Philipp Emanuel", "C. P. E."]
-    url: https://en.wikipedia.org/wiki/Carl_Philipp_Emanuel_Bach
-
-"przibram":
-  - firstname: ["Karl"]
-    url: https://link.springer.com/article/10.1007/s00016-019-00242-z
-
-"schrodinger":
-  - firstname: ["Erwin"]
-    url: https://en.wikipedia.org/wiki/Erwin_Schr%C3%B6dinger
-
-"lorentz":
-  - firstname: ["Hendrik Antoon"]
-    url: https://en.wikipedia.org/wiki/Hendrik_Lorentz
-
-"planck":
-  - firstname: ["Max"]
-    url: https://en.wikipedia.org/wiki/Max_Planck
+"xu": 
+  - firstname: ["Ruoyang"]
+    url: https://www.linkedin.com/in/ruoyang-xu-46807b135/
