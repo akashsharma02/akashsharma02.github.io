@@ -51,7 +51,7 @@ In this blog, I cover the basics required to understand inertial navigation in r
 
 ## A (micro) micro lie-theory review 
 
-This section is largely adapted from Sola et al. <d-cite key="sola2018micro"></d-cite>.
+An expert reader may choose to skip this section, however this section is important to understand the underlying math and motivation behind IMU pre-integration. This section is largely adapted from Sola et al. <d-cite key="sola2018micro"></d-cite>.
 
 {% details A smooth manifold %}
 is a curved and differentiable (no-spikes / edges) hyper-surface embedded in a higher dimension that locally resembles a linear space $$\mathbb{R}^n$$. 
@@ -137,15 +137,50 @@ $$
 [\omega]_\times = \begin{bmatrix}0 & -\omega_x & \omega_y \\ -\omega_x & 0 & \omega_z \\ -\omega_y & \omega_z & 0\end{bmatrix}
 $$
 
-This implies $$\dot{\mathbf{R}}^\top \mathbf{R} = [\omega]_\times$$ or $$ \dot{\mathbf{R}} = \mathbf{R}[\omega]_\times$$. When $$\mathbf{R} = \mathbf{I}$$, then $$\dot{\mathbf{R}} = [\omega]_\times$$, which consequently means that $$[\omega]_\times$$ the space of skew symmetric matrices forms the Lie algebra for $$\text{SO}(3)$$. Finally, we observe that $$[\omega]_\times$$ is 3 degrees of freedom by inspection, and that it can be represented as a linear combination of generators as follows: 
+This implies $$\dot{\mathbf{R}}^\top \mathbf{R} = [\omega]_\times$$ or 
+
+$$ 
+\begin{align}
+\dot{\mathbf{R}} = \mathbf{R}[\omega]_\times \label{eq:so3_lie_algebra}
+\end{align}
+$$. 
+
+When $$\mathbf{R} = \mathbf{I}$$, then $$\dot{\mathbf{R}} = [\omega]_\times$$, which consequently means that $$[\omega]_\times$$ the space of skew symmetric matrices forms the Lie algebra for $$\text{SO}(3)$$. Finally, we observe that $$[\omega]_\times$$ is 3 degrees of freedom by inspection, and that it can be represented as a linear combination of generators as follows: 
 
 $$
 [\omega]_\times = \omega_x \begin{bmatrix}0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0\end{bmatrix} + \omega_y\begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0\end{bmatrix} + \omega_z \begin{bmatrix}0 & -1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 0\end{bmatrix}
 $$
 
 if we denote the basis elements as $$\text{E}_x, \text{E}_y, \text{E}_z$$ respectively, then we can denote $$\omega = (\omega_x, \omega_y, \omega_z) \in \mathbb{R}^3$$ as the vector representation of the lie algebra.
+ 
+Now, let us attempt to obtain a closed form expression for the $$\text{exp}$$ map for $$\text{SO}(3)$$. We see from equation ($$\ref{eq:so3_lie_algebra}$$), that we have a differential equation, where $$\dot{\mathbf{R}} \in T_\mathbf{R}\text{SO}(3)$$. For infinitesimal time increments $$\Delta t$$, we can assume that $$\omega$$ is constant, then we obtain the solution to the above ordinary differential equation as: 
 
+$$
+\begin{align}
+\int \dot{\mathbf{R}} &= \int \mathbf{R}[\omega]_\times \Delta t \\
+\implies \mathbf{R}(t) &= \mathbf{R}_{0} \text{exp}([\omega]_\times \Delta t)
+\end{align}
+$$
+If we start at the origin $$\mathbf{R}_0 = \mathbf{I}$$, then we have $$\mathbf{R}(t) = \text{exp}([\omega]_\times \Delta t)$$. 
 
+Now since $$\omega$$ can also be represented as a vector element, we can define $$\mathbf{theta} \triangleq \omega \Delta t = \mathbf{u} \theta \in \mathbb{R}^3$$, where $$\mathbf{u}$$ is a unit vector denoting the axis of rotation, and $$\theta$$ denotes the rotation about said axis. It must be noted that 3-axis gyroscopes measure this angular velocity $$\omega$$. 
+
+Let us now expand the matrix exponential terms: 
+$$
+\begin{align}
+\mathbf{R} = \text{exp}([\mathbf{\theta}]_\times) = \sum_k \frac{\theta^k}{k !}([\mathbf{u}]_\times)^k
+\end{align}
+$$
+
+Using the properties of skew symmetric matrices we see that $$[\mathbf{u}]^0_\times = \mathbf{I}, [\mathbf{u}]^3_\times = -[\mathbf{u}]_\times, [\mathbf{u}]^3_\times = -[\mathbf{u}]^2_\times$$. We can thus rewrite the series above as 
+
+$$
+\begin{align}
+\mathbf{R} &= \mathbf{I} + [\mathbf{u}]_\times \Bigl\{ \theta - \frac{1}{3!}\theta^3 + \frac{1}{5!}\theta^5 - \dots \Bigr\} + [\mathbf{u}]_\times^2 \Bigl\{ \frac{1}{2} \theta^2 - \frac{1}{4!}\theta^4 + \frac{1}{6!}\theta^6 -\dots \Bigr\} \\
+\mathbf{R} &= \mathbf{I} + [\mathbf{u}]_\times \sin \theta + [\mathbf{u}]^2_\times (1 - \cos \theta) \label{eq:rodrigues}
+\end{align}
+$$
+Where equation $$\ref{eq:rodrigues}$$ is the closed form expression for the exponential map for $$\text{SO}(3)$$ and also known as the rodrigues formula <d-cite key="rodrigues2024wiki"></d-cite> in literature.
 
 ### $$\oplus$$, $$\ominus$$ and the Adjoint operators
 
