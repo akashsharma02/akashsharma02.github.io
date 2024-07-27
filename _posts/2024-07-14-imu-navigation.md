@@ -179,7 +179,7 @@ Let us now expand the matrix exponential terms:
 
 $$
 \begin{align}
-\mathbf{R} = \text{exp}([\mathbf{\theta}]_\times) = \sum_k \frac{\theta^k}{k !}([\mathbf{u}]_\times)^k
+\mathbf{R} = \text{exp}([\boldsymbol\theta]_\times) = \sum_k \frac{\theta^k}{k !}([\mathbf{u}]_\times)^k
 \end{align}
 $$
 
