@@ -22,7 +22,7 @@ bibliography: 2024-07-14-imu-navigation.bib
 #     jekyll-toc plugin (https://github.com/toshimaru/jekyll-toc).
 toc:
   - name: Introduction
-  - name: A (micro) micro Lie theory review for inertial navigation
+  - name: A (micro) micro Lie theory review 
     # if a section has subsections, you can add them as follows:
     # subsections:
     #   - name: Example Child Subsection 1
@@ -39,22 +39,22 @@ toc:
 ## Introduction 
 
 Inertial Measurement Units (IMU) are typically used to track the position and orientation of an object body relative to a known starting position, orientation and velocity. Two configurations of inertial navigation are common <d-cite key="woodman2007introduction"></d-cite>: 
-1. stable platform system where the inertial unit is placed in the global coordinate frame and does not move along with the body, and
-2. strapdown navigation system where the inertial unit is rigidly attached to the moving object i.e., the IMU is in the body coordinate frame. 
+1. a stable platform system where the inertial unit is placed in the global coordinate frame and does not move along with the body, and
+2. a strapdown navigation system where the inertial unit is rigidly attached to the moving object i.e., the IMU is in the body coordinate frame. 
 
 These devices typically contain 
 
-1. **Gyroscopes** which measure the angular velocity
-2. **Accelerometers** which measure the total sum of linear acceleration acting on its body. $${}_b\mathbf{a}_k$$ acting on the body frame at time instant $$k$$ and the acceleration due to gravity on the body $$ -(\mathbf{R}_k^W)^{\top} {}_w \mathbf{g}$$ therefore, the measurement made by the accelerometer is $${}_b\mathbf{a}_k -(\mathbf{R}_k^W)^{\top} {}_w \mathbf{g}$$
+1. **Gyroscopes** which measure the angular velocity of the body, denoted $${}_b\omega_k$$ for angular velocity of the body frame $$b$$ at a time instant $$k$$
+2. **Accelerometers** which measure the total sum of linear acceleration acting on its body, typically denoted with $${}_b a_k$$ similarly in the body frame $$b$$ at time instant $$k$$
 
 In this blog, I cover the basics required to understand inertial navigation in robot state estimation, and also explain the motivation behind IMU pre-integration<d-cite key="forster2016manifold"></d-cite>, the defacto way to deal with inertial measurements in visual-inertial SLAM. 
 
-## A (micro) micro lie-theory review for inertial navigation
+## A (micro) micro lie-theory review 
 
 This section is largely adapted from Sola et al. <d-cite key="sola2018micro"></d-cite>.
 
-{% details Smooth manifold %}
-A curved and differentiable (no-spikes / edges) hyper-surface embedded in a higher dimension that locally resembles a linear space $$\mathbb{R}^n$$. 
+{% details A smooth manifold %}
+is a curved and differentiable (no-spikes / edges) hyper-surface embedded in a higher dimension that locally resembles a linear space $$\mathbb{R}^n$$. 
 Examples: 
 
 - 3D vectors with unit norm constraint form a spherical manifold in $$\mathbb{R}^3$$
@@ -62,8 +62,8 @@ Examples:
 - 3D Rotations form a hyper-sphere (3-sphere) in $$\mathbb{R}^4$$
 {% enddetails %} 
 
-{% details Group %}
-Group $$\mathcal{G}$$ is a set with a composition operator $$\circ$$ that for elements $$\mathcal{X}, \mathcal{Y}, \mathcal{Z} \in \mathcal{G}$$ satisfies the following axioms: 
+{% details A Group $$\mathcal{G}$$ %}
+is a set with a composition operator $$\circ$$ that for elements $$\mathcal{X}, \mathcal{Y}, \mathcal{Z} \in \mathcal{G}$$ satisfies the following axioms: 
 - Closure under $$\circ: \mathcal{X} \circ \mathcal{Y} \in \mathcal{G}$$
 - Identity $$\mathcal{E}: \mathcal{E} \circ \mathcal{X} = \mathcal{X} \circ \mathcal{E} = \mathcal{X}$$
 - Inverse $$\mathcal{X}^{-1}: \mathcal{X}^{-1} \circ \mathcal{X} = \mathcal{X} \circ \mathcal{X}^{-1} = \mathcal{E}$$
@@ -73,29 +73,78 @@ Notice the omission of commutativity
 
 ### Lie Group
 
-A Lie Group is a smooth manifold that appears identical i.e., has identical curvature and properties at every point on the manifold (such as the sphere and circle) and also satisfies the group properties. 
-Examples: 
-* The unit complex number group $$\mathbf{S}^1: \mathbf{z} = \cos \theta + i \sin \theta = e^{i\theta}$$ under complex multiplication forms a lie manifold. The unit norm of the complex numbers forms a 1-sphere or circle in $$\mathbb{R}^2$$ 
+A Lie Group is a smooth manifold meaning that it has a locally euclidean structure, and also satisfies the properties of a group. A Lie Grou has identical curvature and other properties at every point on the manifold (imagine a circle for example).
+Some examples are: 
+* $$\mathbb{R}^n$$ is also a lie group under the group composition operation of *addition*. 
+* The General Linear Real matrix group, the set of all $$n \times n$$ invertible matrices $$\text{GL}(n, \mathbb{R}) \subset \mathbb{R}^{n^2}$$ is a lie group under *matrix multiplication*
+* The unit complex number group $$\text{S}^1: \mathbf{z} = \cos \theta + i \sin \theta = e^{i\theta}$$ under *complex multiplication* forms a lie manifold. The unit norm of the complex numbers forms a 1-sphere or circle in $$\mathbb{R}^2$$ 
+* The three dimensional sphere $$\text{S}^3 \subset \mathbb{R}^4$$ is a lie group, we identify with quaternions $$\mathbb{H} \triangleq \{\text{x}_0 + \text{x}_1 i + \text{x}_2 j + \text{x}_3 k \}$$ ($$\mathbb{H}$$ read as Hamiltonian) under the *quaternion multiplication* forms a lie manifold
+
+Note however that the 2-sphere $$\text{S}^2$$ is not a Lie Group, since we cannot define a group composition operator over it. To understand this, let us consider the *hairy ball theorem* <d-cite key="hairy2024wiki"></d-cite>, which roughly states that if you consider a sphere with hair on it, an attempt to comb all the hair such that all of them are pointing in a certain direction will fail and there will exist at least one vanishing point. More formally, there is no non-vanishing continous tangent space on $$\text{S}^2$$. This implies that we cannot define a smooth function that can act as a group composition operator on this differentiable manifold.
 
 ### Lie Group Action
 
-Elements of the Lie Group can act on elements from other sets. For example, a unit quaternion $$ \mathbf{q} \in \mathbb{H}$$ (a lie group element) acts on an element $$\mathbf{x} \in \mathbb{R}^3$$ through quaternion multiplication to cause its rotation $$ \mathbb{H} \times \mathbb{R}^3 \rightarrow \mathbb{R}^3 : \mathbf{q} \cdot \mathbf{x} \cdot \mathbf{q}^*$$. 
+Elements of the Lie Group can act on elements from other sets. For example, a unit quaternion $$ \mathbf{q} \in \mathbb{H}$$ acts on an element $$\mathbf{x} \in \mathbb{R}^3$$ through quaternion multiplication to cause its rotation $$ \mathbb{H} \times \mathbb{R}^3 \rightarrow \mathbb{R}^3 : \mathbf{q} \cdot \mathbf{x} \cdot \mathbf{q}^*$$. 
 
 ### Tangent space and the Lie Algebra
 
-Let $$\mathcal{X}(t)$$ be a point on the Lie manifold $$\mathcal{M}$$ then $$\dot{\mathcal{X}} = \frac{d\mathcal{X}}{dt}$$ belongs to its tangent space at $$\mathcal{X}$$ (or linearized at $$\mathcal{X}$$) denoted as $$T_\mathcal{X}\mathcal{M}$$. Since we note that the lie group has the same curvature throughout the manifold, the tangent space $$T_{\mathcal{X}}\mathcal{M}$$ also has the same structure everywhere. 
+Let $$\mathcal{X}(t)$$ be a point on the Lie manifold $$\mathcal{M}$$, then taking its time derivative we obtain $$\dot{\mathcal{X}} = \frac{d\mathcal{X}}{dt}$$ that belongs to its tangent space at $$\mathcal{X}$$ (or roughly linearized at $$\mathcal{X}$$) denoted as $$T_\mathcal{X}\mathcal{M}$$. Since we note that the lie group has the same curvature throughout the manifold, the tangent space $$T_{\mathcal{X}}\mathcal{M}$$ also has the same structure everywhere. In fact, by definition every Lie group of dimension $$n$$ must have a tangent space described by $$n$$ basis elements $$\{\text{E}_1 \dots \text{E}_n\}$$ (sometimes also called *generators*) for $$T_\mathcal{X}\mathcal{M}$$.  
+For instance, the tangent space for the group of unit complex numbers is the tangent to a circle at any point forming a straight line. 
 
-The *Lie Algebra* then is simply the tangent space of a Lie group -- linearized -- at the identity element $$\mathcal{E}$$ of the group. Every Lie group $$\mathcal{M}$$ has an associated lie algebra $$\mathfrak{m}$$. The Lie algebra $$\mathfrak{m}$$ is a vector space.
+The **Lie Algebra** then is simply the tangent space of a Lie group -- linearized -- at the identity element $$\mathcal{E}$$ of the group. Every Lie group $$\mathcal{M}$$ has an associated lie algebra $$\mathfrak{m} \triangleq T_\mathcal{E}\mathcal{M}$$. The Lie algebra $$\mathfrak{m}$$ is a vector space.
 
-### $$\mathbf{Exp}$$ and $$\mathbf{Log}$$ map
+### $$\mathbf{exp}$$ and $$\mathbf{log}$$ map
 
-$$\mathbf{exp}: \mathfrak{m} \rightarrow \mathcal{M}$$ map takes elements on the tangent vector space to the Lie Group space *exactly*. The $$\mathbf{log}: \mathcal{M} \rightarrow \mathfrak{m}$$ does the inverse. We can  
+Now, we may define two operators to navigate the Lie group as follows: 
 
-Because the *tangent space* is a vector space, it can also be expressed as a linear combination of basis elements -- called *generators* -- that constrain $$\mathbb{R}^m$$ to the tangent space $$\mathfrak{m}$$. Then we define two operators *hat* and *vee* that transfer elements between their Lie algebra and their vector space representation and vice-versa. 
+* $$\text{exp}: T_\mathcal{X}\mathcal{M} \rightarrow \mathcal{M}$$ is a map that retracts (takes) elements on the tangent vector space to the Lie Group space *exactly*. Intuitively, the $$\text{exp}$$ operator wraps the tangent element onto the Lie group manifold. 
+* Similarly $$\text{log}: \mathcal{M} \rightarrow T_\mathcal{X}\mathcal{M}$$ is a map that takes elements on the group to its tangent vector space element. 
+ 
+The $$\text{exp}$$ naturally arises when considering the time derivative, or an infinitesimal tangent increment $$v \in T_\mathcal{X}\mathcal{M}$$ in unit time on the Group manifold: 
 
+$$
+\begin{align}
+\frac{d\mathcal{X}}{dt} &= \mathcal{X}{v} \\
+\frac{d\mathcal{X}}{\mathcal{X}} &= v~dt \\
+\implies \mathcal{X}(t) &= \mathcal{X}(0) \text{exp}(vt) \\
+\implies \text{exp}(vt) &= \mathcal{X}(0)^{-1}\mathcal{X}(t) \in \mathcal{M}
+\end{align}
+$$
+i.e., $$\text{exp}(vt)$$ is a group element.
 
+### $$\mathbf{SO(3)}$$ example
 
-$$\mathbf{SO(3)}$$ example
+The group of rotations $$\mathbf{SO}(3)$$ is a matrix group of size 9 operating on $$\mathbb{R}^3$$, with the following constraints: 
+* It is invertible $$\implies \mathbf{SO(3)} \subseteq \mathbb{GL}(3)$$
+* It is orthogonal i.e., it has a determinant of $$\pm$$ 1 $$\implies \mathbf{SO}(3) \subseteq \mathbf{O}(3)$$
+* It is special orthogonal i.e., determinant is strictly $$+1$$ i.e., reflections are not possible.
+
+For this group, we have the special orthogonality condition which can be written as: 
+$$
+\mathbf{R}^{-1}\mathbf{R} = \mathbf{I} = \mathbf{R}^\top \mathbf{R}
+$$ 
+Since $$\mathbf{R}^{-1} = \mathbf{R}^\top$$. Now, to obtain the tangent space for this group, let's take the time differential: 
+$$
+\begin{align}
+\dot{\mathbf{R}}^\top \mathbf{R} + \mathbf{R}\dot{\mathbf{R}}^\top &= 0 \\
+\implies \dot{\mathbf{R}}^\top \mathbf{R} &= -\mathbf{R}\dot{\mathbf{R}}^\top \\
+\implies \dot{\mathbf{R}}^\top \mathbf{R} &= - (\dot{\mathbf{R}}^\top \mathbf{R})^\top
+\end{align}
+$$
+This means that $$\dot{\mathbf{R}}^\top \mathbf{R}$$ is skew-symmetric, and skew symmetric matrices always have the following form: 
+
+$$
+[\omega]_\times = \begin{bmatrix}0 & -\omega_x & \omega_y \\ -\omega_x & 0 & \omega_z \\ -\omega_y & \omega_z & 0\end{bmatrix}
+$$
+
+This implies $$\dot{\mathbf{R}}^\top \mathbf{R} = [\omega]_\times$$ or $$ \dot{\mathbf{R}} = \mathbf{R}[\omega]_\times$$. When $$\mathbf{R} = \mathbf{I}$$, then $$\dot{\mathbf{R}} = [\omega]_\times$$, which consequently means that $$[\omega]_\times$$ the space of skew symmetric matrices forms the Lie algebra for $$\text{SO}(3)$$. Finally, we observe that $$[\omega]_\times$$ is 3 degrees of freedom by inspection, and that it can be represented as a linear combination of generators as follows: 
+
+$$
+[\omega]_\times = \omega_x \begin{bmatrix}0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0\end{bmatrix} + \omega_y\begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0\end{bmatrix} + \omega_z \begin{bmatrix}0 & -1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 0\end{bmatrix}
+$$
+
+if we denote the basis elements as $$\text{E}_x, \text{E}_y, \text{E}_z$$ respectively, then we can denote $$\omega = (\omega_x, \omega_y, \omega_z) \in \mathbb{R}^3$$ as the vector representation of the lie algebra.
+
 
 
 ### $$\oplus$$, $$\ominus$$ and the Adjoint operators
