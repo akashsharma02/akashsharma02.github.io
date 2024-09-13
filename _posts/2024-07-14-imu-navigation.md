@@ -2,10 +2,10 @@
 layout: distill
 title: almost everything about IMU navigation 
 description: strapdown inertial navigation basics with an explanation of IMU pre-integration 
-tags: distill research 
+# tags: research 
 giscus_comments: false
 date: 2024-07-14
-featured: true
+featured: false
 citation: true
 
 authors:
@@ -37,6 +37,7 @@ toc:
 # If you use this post as a template, delete this _styles block.
 ---
 ## Introduction 
+Inertial Measurement Units (IMU) are ubiquitous devices that are present in many consumer electronic devices today such as smartphones, smart watches, quadrotor drones, vehicles, etc. These are relatively inexpensive and can be a cheap way to know the position and orientation of a device. Their use can range from pedestrian tracking with cheap IMUs to maintaining state for rockets with expensive and accurate IMUs. Therefore, I've been fascinated with IMU navigation for a while. In this writeup, I cover the basics required to understand inertial navigation for robot state estimation, and also explain the motivation behind IMU pre-integration<d-cite key="forster2016manifold"></d-cite>, the defacto way to deal with inertial measurements in visual-inertial SLAM. 
 
 Inertial Measurement Units (IMU) are typically used to track the position and orientation of an object body relative to a known starting position, orientation and velocity. Two configurations of inertial navigation are common <d-cite key="woodman2007introduction"></d-cite>: 
 1. a stable platform system where the inertial unit is placed in the global coordinate frame and does not move along with the body, and
@@ -45,9 +46,8 @@ Inertial Measurement Units (IMU) are typically used to track the position and or
 These devices typically contain 
 
 1. **Gyroscopes** which measure the angular velocity of the body, denoted $${}_b\omega_k$$ for angular velocity of the body frame $$b$$ at a time instant $$k$$
-2. **Accelerometers** which measure the total sum of linear acceleration acting on its body, typically denoted with $${}_b a_k$$ similarly in the body frame $$b$$ at time instant $$k$$
+2. **Accelerometers** which measure the resultant linear acceleration acting on its body, typically denoted with $${}_b a_k$$ similarly in the body frame $$b$$ at time instant $$k$$
 
-In this blog, I cover the basics required to understand inertial navigation in robot state estimation, and also explain the motivation behind IMU pre-integration<d-cite key="forster2016manifold"></d-cite>, the defacto way to deal with inertial measurements in visual-inertial SLAM. 
 
 ## A (micro) micro lie-theory review 
 
@@ -73,32 +73,41 @@ Notice the omission of commutativity
 
 ### Lie Group
 
-A Lie Group is a smooth manifold meaning that it has a locally euclidean structure, and also satisfies the properties of a group. A Lie Grou has identical curvature and other properties at every point on the manifold (imagine a circle for example).
-Some examples are: 
-* $$\mathbb{R}^n$$ is also a lie group under the group composition operation of *addition*. 
-* The General Linear Real matrix group, the set of all $$n \times n$$ invertible matrices $$\text{GL}(n, \mathbb{R}) \subset \mathbb{R}^{n^2}$$ is a lie group under *matrix multiplication*
-* The unit complex number group $$\text{S}^1: \mathbf{z} = \cos \theta + i \sin \theta = e^{i\theta}$$ under *complex multiplication* forms a lie manifold. The unit norm of the complex numbers forms a 1-sphere or circle in $$\mathbb{R}^2$$ 
-* The three sphere $$\text{S}^3 \subset \mathbb{R}^4$$ is a lie group, we identify with quaternions $$\mathbb{H} \triangleq \{\text{x}_0 + \text{x}_1 i + \text{x}_2 j + \text{x}_3 k \}$$ ($$\mathbb{H}$$ read as Hamiltonian) under the *quaternion multiplication* forms a lie manifold
+A Lie Group is a smooth manifold that also satisfies the properties of a group. A Lie Group has identical curvature at every point on the manifold (imagine a circle for example).
 
-{% details 2-sphere %}
+Some examples: 
+* $$\mathbb{R}^n$$ is a Lie group under the group composition operation of *addition*. 
+* The General Linear Real matrix group, the set of all $$n \times n$$ invertible matrices $$\mathbb{GL}(n, \mathbb{R}) \subset \mathbb{R}^{n^2}$$ is a Lie group under *matrix multiplication*
+* The unit complex number group $$\text{S}^1: \mathbf{z} = \cos \theta + i \sin \theta = e^{i\theta}$$ under *complex multiplication* forms a Lie group. The unit norm of the complex numbers forms a 1-sphere or circle in $$\mathbb{R}^2$$ 
+* The three sphere $$\text{S}^3 \subset \mathbb{R}^4$$ is a lie group, we identify with quaternions $$\mathbb{H} \triangleq \{\text{x}_0 + \text{x}_1 i + \text{x}_2 j + \text{x}_3 k \}$$ ($$\mathbb{H}$$ read as Hamiltonian) under the *quaternion multiplication* forms a Lie group
+
+{% details 2-sphere is not a Lie group %}
 Note that the 2-sphere $$\text{S}^2$$ is not a Lie Group, since we cannot define a group composition operator over it. To understand this, let us consider the *hairy ball theorem* <d-cite key="hairy2024wiki"></d-cite>, which roughly states that if you consider a sphere with hair on it, an attempt to comb all the hair such that all of them are pointing in a certain direction will fail and there will exist at least one vanishing point. More formally, there is no non-vanishing continous tangent space on $$\text{S}^2$$. This implies that we cannot define a smooth function that can act as a group composition operator on this differentiable manifold.
 {% enddetails %}
 
 ### Lie Group Action
 
-Elements of the Lie Group can act on elements from other sets. For example, a unit quaternion $$ \mathbf{q} \in \mathbb{H}$$ acts on an element $$\mathbf{x} \in \mathbb{R}^3$$ through quaternion multiplication to cause its rotation $$ \mathbb{H} \times \mathbb{R}^3 \rightarrow \mathbb{R}^3 : \mathbf{q} \cdot \mathbf{x} \cdot \mathbf{q}^*$$. 
+Elements of the Lie group can act on elements from other sets. For example, a unit quaternion $$ \mathbf{q} \in \mathbb{H}$$ acts on a vector $$\mathbf{x} \in \mathbb{R}^3$$ through quaternion multiplication to cause its rotation $$ \mathbb{H} \times \mathbb{R}^3 \rightarrow \mathbb{R}^3 : \mathbf{q} \cdot \mathbf{x} \cdot \mathbf{q}^*$$. 
 
 ### Tangent space and the Lie Algebra
 
-Let $$\mathcal{X}(t)$$ be a point on the Lie manifold $$\mathcal{M}$$, then taking its time derivative we obtain $$\dot{\mathcal{X}} = \frac{d\mathcal{X}}{dt}$$ that belongs to its tangent space at $$\mathcal{X}$$ (or roughly linearized at $$\mathcal{X}$$) denoted as $$T_\mathcal{X}\mathcal{M}$$. Since we note that the lie group has the same curvature throughout the manifold, the tangent space $$T_{\mathcal{X}}\mathcal{M}$$ also has the same structure everywhere. In fact, by definition every Lie group of dimension $$n$$ must have a tangent space described by $$n$$ basis elements $$\{\text{E}_1 \dots \text{E}_n\}$$ (sometimes also called *generators*) for $$T_\mathcal{X}\mathcal{M}$$.  
+Let $$\mathcal{X}(t)$$ be a point on the Lie manifold $$\mathcal{M}$$, then taking its time derivative we obtain $$\dot{\mathcal{X}} = \frac{d\mathcal{X}}{dt}$$ which belongs to its tangent space at $$\mathcal{X}$$ (or roughly linearized at $$\mathcal{X}$$) denoted as $$T_\mathcal{X}\mathcal{M}$$. Since we note that the lie group has the same curvature throughout the manifold, the tangent space $$T_{\mathcal{X}}\mathcal{M}$$ also has the same structure everywhere. In fact, by definition every Lie group of dimension $$n$$ must have a tangent space described by $$n$$ basis elements $$\{\text{E}_1 \dots \text{E}_n\}$$ (sometimes also called *generators*) for $$T_\mathcal{X}\mathcal{M}$$.  
 
-For instance, the tangent space for the group of unit complex numbers is the tangent to a circle at any point forming a straight line. 
+For instance, the tangent space for the unit complex number group $$\text{S}^1$$ is the tangent to a circle at any point forming a straight line i.e., $$\in \mathbb{R}^1$$. 
 
 The **Lie Algebra** then is simply the tangent space of a Lie group -- linearized -- at the identity element $$\mathcal{E}$$ of the group. Every Lie group $$\mathcal{M}$$ has an associated lie algebra $$\mathfrak{m} \triangleq T_\mathcal{E}\mathcal{M}$$. The Lie algebra $$\mathfrak{m}$$ is a vector space.
 
+{% details $$\wedge$$ and $$\vee$$ operators %}
+We can also define functions that convert the tangent space elements between their vector space representation $$\mathbb{R}^m$$ and their structured space $$\mathfrak{m}$$ using the $$\text{hat}$$ and $$\text{vee}$$ operators. 
+* $$\wedge: \mathbb{R}^m \rightarrow \mathfrak{m}; \tau \rightarrow \tau^\wedge = \sum_{i=1}^{m} \tau_i \text{E}_i$$
+* $$\vee: \mathfrak{m} \rightarrow \mathbb{R}^m; \tau^{\wedge} \rightarrow (\tau^{\wedge})^{\vee} = \tau = \sum_{i=1}^{m} \tau_i \text{e}_i$$
+
+where let's signify $$\text{e}_i$$ as the basis elements of $$\mathbb{R}^m$$. In this article, I will largely attempt to not make use of these operators in an attempt to keep the math concise, and in most cases the variant of Lie algebra used is apparent from context. 
+{% enddetails %}
+
 ### $$\mathbf{exp}$$ and $$\mathbf{log}$$ map
 
-Now, we may define two operators to navigate the Lie group as follows: 
+Now, we may define two operators to navigate between Lie group and the Lie algebra as follows: 
 
 * $$\text{exp}: T_\mathcal{X}\mathcal{M} \rightarrow \mathcal{M}$$ a map that retracts (takes) elements on the tangent vector space to the Lie Group space *exactly*. Intuitively, the $$\text{exp}$$ operator wraps the tangent element onto the Lie group manifold. 
 * Similarly $$\text{log}: \mathcal{M} \rightarrow T_\mathcal{X}\mathcal{M}$$ a map that takes elements on the group to its tangent vector space element. 
@@ -114,6 +123,25 @@ $$
 \end{align}
 $$
 i.e., $$\text{exp}(vt)$$ is a group element.
+
+{% details Properties of the $$\text{exp}$$ map %}
+The $$\text{exp}$$ map satisfies a few important properties which are useful to know
+* $$\text{exp}((t + s) \tau) = \text{exp}(t \tau) \text{exp}(s \tau)$$
+* $$\text{exp}(t\tau) = \text{exp}(\tau)^t$$
+* $$\text{exp}(-\tau) = \text{exp}(\tau)^{-1}$$
+* $$\begin{align}\text{exp}(\mathcal{X} \tau \mathcal{X}^{-1}) = \mathcal{X} \text{exp}(\tau) \mathcal{X}^{-1} \label{eq:adjoint_property}\end{align}$$
+ 
+Where the last property is quite important, which I understand as: the exponential map is a no-op for elements already on the Lie manifold
+{% enddetails %}
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/ideal_imu_navigation.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+    </div>
+</div>
+<div class="caption">
+  An illustration of Lie Group definitions and operations with the unit complex group $\text{S}^1$ as the example
+</div>
 
 ### $$\mathbf{SO(3)}$$ example
 
@@ -196,9 +224,23 @@ Where equation ($$\ref{eq:rodrigues}$$) is the closed form expression for the ex
 
 ### $$\oplus$$, $$\ominus$$ and the Adjoint operators
 
-## Navigation with ideal IMU measurements
+$$\oplus$$ and $$\ominus$$ operators allow us to define increments on the Lie group. These combine the composition operator and the $$\text{exp}$$ and $$\text{log}$$ operator together. Because the composition operation on Lie groups is not commutative, we obtain two variants, $$\text{right}$$ and $$\text{left}$$ operators
 
-As eluded to in the <a href="#{{Introduction}}">Introduction</a>, an ideal Inertial Measurement Unit (IMU) mainly contains two sensors *Gyroscope* and *Accelerometer* and sometimes optionally a *magnetometer*.
+$$
+\begin{align}
+\text{right}~\oplus &: \mathcal{Y} = \mathcal{X} \oplus {}^\mathcal{X}\tau \triangleq \mathcal{X} \circ \text{exp}({}^\mathcal{X}\tau^\wedge) \in \mathcal{M} \label{eq:right_oplus}\\
+\text{right}~\ominus &: {}^\mathcal{X}\tau = \mathcal{Y} \ominus \mathcal{X} \triangleq \text{log}(\mathcal{X}^{-1}\circ \mathcal{Y})^\vee \in T_\mathcal{X}\mathcal{M}
+\end{align}
+$$
+
+Notice that in the above operator $$\exp({}^\mathcal{X}\tau^\wedge)$$ appears on the right side of the composition $$\circ$$ operator. Note that $${}^\mathcal{X}$$ denotes that the tangent element is *linearized* at $$\mathcal{X}$$ Similarly we have the $$\text{left}$$ variants of the operators which include Lie algebra increments instead: 
+
+$$
+\begin{align}
+\text{left}~\oplus &: \mathcal{Y} = {}^\mathcal{E}\tau \oplus \mathcal{X} \triangleq \text{exp}({}^\mathcal{E}\tau^\wedge) \circ \mathcal{X} \in \mathcal{M} \label{eq:left_oplus}\\
+\text{left}~\ominus &: {}^\mathcal{X}\tau = \mathcal{Y} \ominus \mathcal{X} \triangleq \text{log}(\mathcal{Y} \circ \mathcal{X}^{-1})^\vee \in T_\mathcal{E}\mathcal{M}
+\end{align}
+$$
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
@@ -206,15 +248,53 @@ As eluded to in the <a href="#{{Introduction}}">Introduction</a>, an ideal Inert
     </div>
 </div>
 <div class="caption">
-  Figure 1: Figure shows a body with an attached IMU moving along a trajectory operating within two instants $i$ and $j$. $\mathbf{W}$ denotes the world frame. At time $i$ the IMU is rotating about the illustrated axis, and eventually reaches a different position and axis of rotation at an intermediate timestep $k$ and reaches the final configuration at time $j$.  
+  $\label{fig:oplus_ominus}$ To reach an element $\mathcal{Y}$ on the Lie manifold, one can take two paths: a) a path defined by the use of right $\oplus$ operator, where you first travel to a tangent element $\mathcal{X}$ and then take a tangent increment ${}^\mathcal{X}\tau$ b) a path defined by the use of left $\oplus$ operator, where you first take a tangent increment at the origin of the Lie group, and then traverse along the geodesic, the same distance as $\mathcal{X}$. 
+</div>
+
+While there is a clear distinction in the operand order for right and left $$\oplus$$ operator, the $$\ominus$$ operator is quite ambiguous. Figure $$\ref{fig:oplus_ominus}$$ illustrates the order of operations on a manifold.
+
+
+Now, if we observe that when traversing on the Lie group one can reach an element $$\mathcal{Y} \in \mathcal{M}$$ via two different trajectories as in equation ($$\ref{eq:right_oplus}, \ref{eq:left_oplus}$$), we obtain the following: 
+
+$$
+\begin{align}
+\mathcal{Y} = \mathcal{X} \oplus {}^\mathcal{X}\tau &= {}^\mathcal{E}\tau \oplus \mathcal{X} \\
+\text{exp}({}^\mathcal{E}\tau^\wedge) \circ \mathcal{X} &= \mathcal{X} \circ \text{exp}({}^\mathcal{X}\tau^\wedge) \\
+\text{exp}({}^\mathcal{E}\tau^\wedge)  &= \mathcal{X} \circ \text{exp}({}^\mathcal{X}\tau^\wedge) \circ \mathcal{X}^{-1} \\
+&= \text{exp}(\mathcal{X} {}^\mathcal{X}\tau^\wedge \mathcal{X}^{-1})~~~\text{Using property of exp map \ref{eq:adjoint_property}} \\
+\implies {}^\mathcal{E}\tau^\wedge = \mathcal{X} {}^\mathcal{X}\tau^\wedge \mathcal{X}^{-1} \label{eq:adjoint}
+\end{align}
+$$
+
+Equation $$\ref{eq:adjoint}$$ can be used to convert a tangent element linearized at a point $$\mathcal{X}$$ on the Lie group to the Lie algebra quite easily, this operation is called as the **adjoint** operator: 
+
+$$
+\text{Ad}_\mathcal{X}: \mathfrak{m} \rightarrow \mathfrak{m}; \tau^\wedge = \text{Ad}_\mathcal{X}(\tau^\wedge) = \mathcal{X} \tau^\wedge \mathcal{X}^{-1}.
+$$
+
+The adjoint operator is quite heavily utilized to obtain some of the IMU pre-integration results, and therefore is quite important to understand.
+
+
+## Navigation with ideal IMU measurements
+
+As eluded to in the <a href="#{{Introduction}}">Introduction</a>, an ideal Inertial Measurement Unit (IMU) mainly contains two sensors *Gyroscope* and *Accelerometer* and sometimes optionally a *magnetometer*. To understand navigation with IMUs, let us first consider an *ideal* IMU, that can make ideal measurements accurately and precisely, **without any noise**. Let us specifically consider its operation in a time window between $$i$$ and $$j$$, and denote any arbitrary time instant within this window as $$k$$. The IMU is traveling along a trajectory in the specified time window and it is both rotating and translating in space. An illustration is given in Figure 1.  
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/ideal_imu_navigation.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+    </div>
+</div>
+<div class="caption">
+  Figure 1: Illustration of an IMU rigidly attached to a moving body observed within a time window $i$ and $j$. $\mathbf{W}$ denotes the world frame. At time $i$ the IMU is rotating about the illustrated axis, and eventually reaches a different position and axis of rotation at an intermediate timestep $k$ and reaches the final configuration at time $j$.  
 </div>
 
 ### Gyroscope and inertial orientation
- An ideal Gyroscope measures the angular velocity or the angular rate of motion $${}_b\omega_k$$ in the body frame $$b$$ at time instant $$k$$. 
- 
- Let us consider the IMU in Figure 1. As it travels along the trajectory from $$i$$ to $$j$$, the axis of rotation changes continuously. If we make the piece-wise linear approximation and assume that the axis of rotation remains fixed between two timesteps, then for an angular velocity measurement at $$k$$ as $$\omega_k$$, angular change in rotation is $$\omega_k \Delta t_k^{k+1} \in \mathfrak{so}(3)$$. Subsequently $$\Delta\mathbf{R}_k^{k+1} = \text{Exp}(\omega_k \Delta t_k^{k+1})$$.
 
-Now assuming that all $$\Delta t$$ are equal we have for the complete trajectory:
+Let us first consider the rotation of the device. An ideal gyroscope measures the angular velocity or how quickly an object is rotating about an axis, as $${}_b \omega_k$$ in the body frame $$b$$ and time $$k$$.
+ 
+In Figure 1, as the IMU travels along the trajectory from $$i$$ to $$j$$, the axis of rotation changes continuously. On discretizing the time window and making the piece-wise linear approximation, we can assume that the axis of rotation remains fixed between two timesteps. Then for an instantaneous angular velocity measurement $$\boldsymbol\omega_k$$ at time $$k$$, the total angular change in rotation is $$\omega_k \Delta t_k^{k+1} \in \mathfrak{so}(3)$$. Subsequently we can obtain the relative rotation for the time period $$k$$ and $$k+1$$ using the exponential map as follows: $$\Delta\mathbf{R}_k^{k+1} = \text{Exp}(\omega_k \Delta t_k^{k+1})$$.
+
+Now assuming that the discretization $$\Delta t$$ is equal, we can then compose the rotational changes between each $$\Delta t$$: 
 
 $$
 \begin{align}
@@ -224,6 +304,27 @@ $$
 $$
 
 ### Accelerometer and inertial velocity and position
+
+Similarly, the accelerometer measures the resultant linear acceleration applied on the robot body. This typically includes any external acceleration that is applied on the body $${}_b \mathbf{a}_k$$ and the acceleration due to gravity on the body $$(\mathbf{R}_k^W)^\top {}_W \mathbf{g}$$. Therefore the total measurement made by an accelerometer is $${}_b \mathbf{a}_k  + (\mathbf{R}_k^W)^\top {}_W \mathbf{g}$$
+
+{% details Gravity convention %}
+We understand from highschool physics that an object at rest experiences a normal force equal and opposite to the gravitational force in the world frame $$-{}_W \mathbf{g}$$. TODO
+{% enddetails %}
+
+Given the initial velocity of the object at $$i$$, we can compute the final velocity of the IMU at $$j$$ by integrating the instantaneous acceleration measurements $${}_b \mathbf{a}_k$$ over the time differences in a similar fashion as for orientation: 
+
+$$
+\begin{align}
+\mathbf{v}_j = \mathbf{v}_i + \sum_{k=i}^{j-1} \mathbf{R}_b^W(({}_b\mathbf{a}_k + (\mathbf{R}_b^W)^\top {}_W \mathbf{g})\Delta t_k) \\
+\mathbf{v}_j = \mathbf{v}_i + {}_W \mathbf{g} \Delta t_i^j + \sum_{k=i}^{j-1} \mathbf{R}_b^W(({}_b\mathbf{a}_k)\Delta t_k \\
+\end{align}
+$$
+
+Then, to obtain the position of the body at time $$j$$ we need to integrate the velocities at each time instants $$k$$ accordingly as below: 
+
+$$
+$$
+
 
 ## Navigation with real IMU measurements
 
