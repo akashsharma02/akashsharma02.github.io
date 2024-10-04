@@ -17,3 +17,15 @@
 "xu": 
   - firstname: ["Ruoyang"]
     url: https://www.linkedin.com/in/ruoyang-xu-46807b135/
+
+"higuera": 
+  - firstname: ["Carolina", "Carolina Higuera", "Higuera, Carolina"]
+    url: https://carolinahiguera.github.io/ 
+
+"mukadam":
+  - firstname: ["Mustafa", "Mustafa Mukadam"]
+    url: https://www.mustafamukadam.com/
+
+"boots": 
+  - firstname: ["Byron", "Byron Boots"]
+    url: https://homes.cs.washington.edu/~bboots/ 

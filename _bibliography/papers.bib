@@ -1,3 +1,34 @@
+@inproceedings{higuera2024sparsh,
+    abbr = {CoRL},
+    pdf = {sparsh.pdf},
+    preview = {sparsh.gif},
+    selected = {true},
+    html = {https://sparsh-ssl.github.io/},
+    title={Sparsh: Self-supervised touch representations for vision-based tactile sensing},
+    abstract={
+        In this work, we introduce general purpose touch representations for the increasingly accessible 
+        class of vision-based tactile sensors. Such sensors have led to many recent advances in robot
+        manipulation as they markedly complement vision, yet solutions today often rely on task 
+        and sensor specific handcrafted perception models. Collecting real data at scale with task 
+        centric ground truth labels, like contact forces and slip, is a challenge further compounded 
+        by sensors of various form factor differing in aspects like lighting and gel markings. 
+        To tackle this we turn to self-supervised learning (SSL) that has demonstrated remarkable 
+        performance in computer vision. We present Sparsh, a family of SSL models 
+        that can support various vision-based tactile sensors, alleviating the need for custom labels 
+        through pre-training on 460k+ tactile images with masking and self-distillation in pixel and latent spaces. 
+        We also build TacBench, to facilitate standardized benchmarking across sensors and models, 
+        comprising of six tasks ranging from comprehending tactile properties to enabling physical 
+        perception and manipulation planning. In evaluations, we find that SSL pre-training for 
+        touch representation outperforms task and sensor-specific end-to-end training by 95.1%
+        on average over TacBench, and Sparsh (DINO)
+        Sparsh (IJEPA) are the most competitive, 
+        indicating the merits of learning in latent space for tactile images. 
+    },
+    author={Carolina Higuera* and Akash Sharma* and Chaithanya Krishna Bodduluri and Taosha Fan and Mrinal Kalakrishnan and Michael Kaess and Byron Boots and Mike Lambeta and Tingfan Wu and Mustafa Mukadam},
+    booktitle={8th Annual Conference on Robot Learning},
+    year={2024},
+    url={https://openreview.net/forum?id=xYJn2e1uu8}
+}
 @inproceedings{Chang_2023_ICCV,
     abbr = {ICCV},
     pdf = {Chang23iccv.pdf},
