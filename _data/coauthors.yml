@@ -29,3 +29,31 @@
 "boots": 
   - firstname: ["Byron", "Byron Boots"]
     url: https://homes.cs.washington.edu/~bboots/ 
+
+"yin":
+  - firstname: ["Alex", "Zhao-Heng", "Zhao-Heng (Alex)"]
+    url: https://zhaohengyin.github.io/
+
+"wang": 
+  - firstname: ["Changhao", "Changhao Wang"]
+    url: https://changhaowang.github.io/
+
+"pineda": 
+  - firstname: ["Luis", "Luis Pineda"]
+    url: https://scholar.google.com/citations?user=rebEn8oAAAAJ&hl=en
+
+"hogan": 
+  - firstname: ["Francois", "Francois Hogan"]
+    url: https://fhogan.github.io/
+
+"malik": 
+  - firstname: ["Jitendra", "Jitendra Malik"]
+    url: https://people.eecs.berkeley.edu/~malik/
+
+"abbeel": 
+  - firstname: ["Pieter", "Pieter Abbeel"]
+    url: https://people.eecs.berkeley.edu/~pabbeel/
+
+"lancaster": 
+  - firstname: ["Patrick", "Patrick Lancaster"]
+    url: https://palanc.github.io/
