@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: Ph.D student @ <a href="https://www.ri.cmu.edu/">The Robotics Institute, CMU</a> • Be curious always 🔭
+subtitle: Ph.D candidate @ <a href="https://www.ri.cmu.edu/">The Robotics Institute, CMU</a> • Be curious always 🔭
 # subtitle: Ph.D student @  <a href="https://www.ri.cmu.edu/">The Robotics Institute, CMU</a> 
 
 profile:
@@ -22,7 +22,7 @@ social: true # includes social icons at the bottom of the page
 ---
 Hey there!
 
-I am a Ph.D. student at the <a href="https://cs.cmu.edu">School of Computer Science</a>, <a href="https://cmu.edu">Carnegie Mellon University (CMU)</a> advised by <a href="https://cs.cmu.edu/~kaess">Prof. Michael Kaess</a>. I also hold a visiting researcher position at <a href="https://ai.meta.com/research/">FAIR, Meta</a> with the FAIR Robotics team, where I collaborate with <a href="https://https://scholar.google.com/citations?user=-fkT5rYAAAAJ&hl=en">Francois Hogan</a> and <a href="https://www.mustafamukadam.com">Mustafa Mukadam</a>.  
+I am a Ph.D. candidate at the <a href="https://cs.cmu.edu">School of Computer Science</a>, <a href="https://cmu.edu">Carnegie Mellon University (CMU)</a> advised by <a href="https://cs.cmu.edu/~kaess">Prof. Michael Kaess</a>. I also hold a visiting researcher position at <a href="https://ai.meta.com/research/">FAIR, Meta</a> with the FAIR Robotics team, where I collaborate with <a href="https://https://scholar.google.com/citations?user=-fkT5rYAAAAJ&hl=en">Francois Hogan</a> and <a href="https://www.mustafamukadam.com">Mustafa Mukadam</a>.  
 
 My research currently focuses on robot perception using varied sensing modalities such as vision and touch to enable dexterous manipulation. I am also broadly interested in state estimation and reconstruction in dynamic environments. I graduated with a Masters in Robotics from CMU (<a href='assets/pdf/msr_thesis.pdf'>Thesis</a>) where I worked on Object SLAM for robot navigation. Before joining CMU, I was briefly a Software Engineer at <a href="https://www.infinera.com">Infinera</a>. I have a Bachelor's degree in Electronics and Communication from <a href="https://jssstuniv.in/#/">Sri Jayachamarajendra College of Engineering (SJCE)</a>.
 
