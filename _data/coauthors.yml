@@ -57,3 +57,31 @@
 "lancaster": 
   - firstname: ["Patrick", "Patrick Lancaster"]
     url: https://palanc.github.io/
+
+"pan": 
+  - firstname: ["Chaoyi", "Chaoyi Pan"]
+    url: https://jc-bao.github.io/
+
+"qi": 
+  - firstname: ["Haozhi", "Haozhi Qi"]
+    url: https://haozhi.io/
+
+"shi": 
+  - firstname: ["Guanya", "Guanya Shi"]
+    url: https://www.gshi.me/
+
+"liu": 
+  - firstname: ["Zixi", "Zixi Liu"]
+    url: https://scholar.google.com/citations?user=4eeVPBoAAAAJ&hl=en
+
+"bharadhwaj": 
+  - firstname: ["Homanga", "Homanga Bharadhwaj"]
+    url: https://homangab.github.io/
+
+"Malik":
+  - firstname: ["Jitendra", "Jitendra Malik"]
+    url: https://people.eecs.berkeley.edu/~malik/
+
+"wu": 
+  - firstname: ["Tingfan", "Tingfan Wu"]
+    url: https://scholar.google.com/citations?user=9bt2Z5QAAAAJ&hl=en
