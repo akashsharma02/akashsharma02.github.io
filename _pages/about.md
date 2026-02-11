@@ -12,6 +12,7 @@ profile:
   more_info: >
     <p id="email">
         <script type="text/javascript">emailScramble = new scrambledString(document.getElementById('email'),'emailScramble', 'smsuahaekd@rmauc.ha',[4,10,6,15,1,5,3,17,2,18,12,9,14,11,19,13,16,7,8]);</script><br></p>
+        <p>San Francisco, CA, United States</p>
 news: true # includes a list of news items
 all_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
