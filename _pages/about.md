@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: Ph.D candidate @ <a href="https://www.ri.cmu.edu/">The Robotics Institute, CMU</a> • Be curious always 🔭
+subtitle: Research Scientist @ Amazon FAR • Be curious always 🔭
 # subtitle: Ph.D student @  <a href="https://www.ri.cmu.edu/">The Robotics Institute, CMU</a> 
 
 profile:
