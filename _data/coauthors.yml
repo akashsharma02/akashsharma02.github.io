@@ -33,6 +33,8 @@
 "yin":
   - firstname: ["Alex", "Zhao-Heng", "Zhao-Heng (Alex)"]
     url: https://zhaohengyin.github.io/
+  - firstname: ["Jessica", "Jessica Yin"]
+    url: https://www.jessicayin.com/
 
 "wang": 
   - firstname: ["Changhao", "Changhao Wang"]
@@ -105,3 +107,19 @@
 "ramanan":
   - firstname: ["Deva", "Deva Ramanan"]
     url: https://www.cs.cmu.edu/~deva/
+
+"wi":
+  - firstname: ["Youngsun", "Youngsun Wi"]
+    url: https://sites.google.com/umich.edu/youngsun-wi/home
+
+"xiang":
+  - firstname: ["Elvis", "Elvis Xiang"]
+    url: https://elviskxiang.github.io/
+
+"fazeli":
+  - firstname: ["Nima", "Nima Fazeli"]
+    url: https://www.mmintlab.com/people/nima-fazeli/
+
+"hellebrekers":
+  - firstname: ["Tess", "Tess Hellebrekers"]
+    url: https://www.tesshellebrekers.com/
