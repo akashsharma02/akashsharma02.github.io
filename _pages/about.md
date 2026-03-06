@@ -11,7 +11,7 @@ profile:
   image_circular: false # crops the image to make it circular
   more_info: >
     <p id="email">
-        <script type="text/javascript">emailScramble = new scrambledString(document.getElementById('email'),'emailScramble', 'smsuahaekd@rmauc.ha',[4,10,6,15,1,5,3,17,2,18,12,9,14,11,19,13,16,7,8]);</script><br></p>
+        <script type="text/javascript">emailScramble = new scrambledString(document.getElementById('email'),'emailScramble', 'mmaohr.s@akaonmzsch',[7,10,11,17,5,6,15,4,8,0,1,9,13,14,18,12,2,16,3]);</script><br></p>
         <p>San Francisco, CA, United States</p>
 news: true # includes a list of news items
 all_papers: true # includes a list of papers marked as "selected={true}"
