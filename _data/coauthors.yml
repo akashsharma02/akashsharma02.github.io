@@ -82,6 +82,26 @@
   - firstname: ["Jitendra", "Jitendra Malik"]
     url: https://people.eecs.berkeley.edu/~malik/
 
-"wu": 
+"wu":
   - firstname: ["Tingfan", "Tingfan Wu"]
     url: https://scholar.google.com/citations?user=9bt2Z5QAAAAJ&hl=en
+
+"karhade":
+  - firstname: ["Jay", "Jay Karhade"]
+    url: https://jaykarhade.github.io/
+
+"keetha":
+  - firstname: ["Nikhil", "Nikhil Keetha"]
+    url: https://nik-v9.github.io/
+
+"zhang":
+  - firstname: ["Yuchen", "Yuchen Zhang"]
+    url: https://infinity1096.github.io/
+
+"scherer":
+  - firstname: ["Sebastian", "Sebastian Scherer"]
+    url: https://theairlab.org/team/sebastian/
+
+"ramanan":
+  - firstname: ["Deva", "Deva Ramanan"]
+    url: https://www.cs.cmu.edu/~deva/

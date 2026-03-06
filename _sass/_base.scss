@@ -4,6 +4,12 @@
 
 // Typography
 
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.7;
+}
+
 p,
 h1,
 h2,
@@ -17,6 +23,10 @@ li,
 span,
 strong {
   color: var(--global-text-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
 }
 
 hr {
@@ -37,10 +47,13 @@ table {
 a,
 table.table a {
   color: var(--global-theme-color);
+  text-decoration: none;
+  transition: color 0.15s ease;
 
   &:hover {
-    color: var(--global-theme-color);
+    color: var(--global-hover-color);
     text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   &:hover:after :not(.nav-item.dropdown) {
@@ -158,6 +171,13 @@ ul.task-list input[type="checkbox"] {
 
 .card {
   background-color: var(--global-card-bg-color);
+  border: 1px solid var(--global-divider-color);
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
 
   .card-img {
     width: 100%;
@@ -169,7 +189,7 @@ ul.task-list input[type="checkbox"] {
   }
 
   .card-body {
-    padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+    padding: 1.25rem;
   }
 }
 
@@ -185,24 +205,31 @@ ul.task-list input[type="checkbox"] {
 .profile {
   width: 100%;
 
+  img {
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
   .more-info {
     margin-bottom: 5px;
-    margin-top: 5px;
-    font-family: monospace;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--global-text-color-light);
+    text-align: center;
 
     p {
-      display: inline-block;
+      display: block;
       margin: 0;
     }
   }
 }
 
 .profile.float-right {
-  margin-left: 1rem;
+  margin-left: 2rem;
 }
 
 .profile.float-left {
-  margin-right: 1rem;
+  margin-right: 2rem;
 }
 
 @media (min-width: 576px) {
@@ -219,7 +246,8 @@ ul.task-list input[type="checkbox"] {
 
 .post-description {
   margin-bottom: 2rem;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  color: var(--global-text-color-light);
 
   a {
     color: inherit;
@@ -238,6 +266,10 @@ ul.task-list input[type="checkbox"] {
   border-bottom: 1px solid var(--global-divider-color);
   background-color: var(--global-bg-color);
   opacity: 0.95;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 .navbar .dropdown-menu {
@@ -279,6 +311,9 @@ ul.task-list input[type="checkbox"] {
 
   .navbar-nav .nav-item .nav-link {
     color: var(--global-text-color);
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+    transition: color 0.2s ease;
 
     &:hover {
       color: var(--global-hover-color);
@@ -371,14 +406,15 @@ ul.task-list input[type="checkbox"] {
 
 .social {
   text-align: center;
+  margin-top: 2rem;
 
   .contact-icons {
-    font-size: 2rem;
+    font-size: 1.75rem;
 
     a {
       i::before {
-        color: var(--global-text-color);
-        transition-property: all 0.2s ease-in-out;
+        color: var(--global-text-color-light);
+        transition: color 0.2s ease;
       }
 
       &:hover {
@@ -391,6 +427,8 @@ ul.task-list input[type="checkbox"] {
 
   .contact-note {
     font-size: 0.8rem;
+    color: var(--global-text-color-light);
+    margin-top: 0.5rem;
   }
 }
 
@@ -427,17 +465,19 @@ ul.task-list input[type="checkbox"] {
 // Footer
 footer.fixed-bottom {
   background-color: var(--global-footer-bg-color);
+  border-top: 1px solid var(--global-divider-color);
   font-size: 0.75rem;
 
   .container {
     color: var(--global-footer-text-color);
-    padding-top: 9px;
-    padding-bottom: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     text-align: center;
   }
 
   a {
     color: var(--global-footer-link-color);
+    text-decoration: none;
 
     &:hover {
       color: var(--global-theme-color);
@@ -450,10 +490,11 @@ footer.sticky-bottom {
   border-top: 1px solid var(--global-divider-color);
   padding-top: 40px;
   padding-bottom: 40px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 
   .container {
     text-align: center;
+    color: var(--global-text-color-light);
   }
 }
 
@@ -667,11 +708,13 @@ footer.sticky-bottom {
   }
 
   h2.bibliography {
-    color: var(--global-divider-color);
-    border-top: 1px solid var(--global-divider-color);
+    color: var(--global-text-color-light);
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
     padding-top: 1rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
     text-align: right;
+    font-size: 1.3rem;
   }
 
   ol.bibliography {
@@ -680,7 +723,13 @@ footer.sticky-bottom {
     margin-top: 0;
 
     li {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       .preview {
       }
@@ -692,6 +741,7 @@ footer.sticky-bottom {
           display: inline-block;
           background-color: var(--global-theme-color);
           margin-bottom: 0.5rem;
+          border-radius: 4px;
 
           a {
             color: white;
@@ -705,6 +755,7 @@ footer.sticky-bottom {
         .award {
           color: var(--global-theme-color) !important;
           border: 1px solid var(--global-theme-color);
+          border-radius: 4px;
         }
       }
 
@@ -742,12 +793,14 @@ footer.sticky-bottom {
       .links {
         a.btn {
           color: var(--global-text-color);
-          border: 1px solid var(--global-text-color);
+          border: 1px solid var(--global-text-color-light);
           padding-left: 1rem;
           padding-right: 1rem;
           padding-top: 0.25rem;
           padding-bottom: 0.25rem;
           margin-left: 0;
+          border-radius: 4px;
+          transition: all 0.15s ease;
 
           &:hover {
             color: var(--global-theme-color);
