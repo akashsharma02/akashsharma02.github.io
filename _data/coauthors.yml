@@ -75,6 +75,8 @@
 "liu": 
   - firstname: ["Zixi", "Zixi Liu"]
     url: https://scholar.google.com/citations?user=4eeVPBoAAAAJ&hl=en
+  - firstname: ["Yulin", "Yulin Liu"]
+    url: https://liuyulinn.github.io/
 
 "bharadhwaj": 
   - firstname: ["Homanga", "Homanga Bharadhwaj"]
@@ -127,3 +129,7 @@
 "hellebrekers":
   - firstname: ["Tess", "Tess Hellebrekers"]
     url: https://www.tesshellebrekers.com/
+
+"christensen":
+  - firstname: ["Henrik", "Henrik I.", "Henrik I. Christensen"]
+    url: https://cse.ucsd.edu/people/faculty-profiles/henrik-christensen
